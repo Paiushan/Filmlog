@@ -1,228 +1,1068 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>FilmLog</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#0a0a0a;color:#f5f5f0;min-height:100vh;padding:16px;padding-bottom:120px}
-h1{text-align:center;font-size:22px;margin-bottom:16px;font-weight:600}
-h1 span{color:#e8c47c}
-.tabs{display:flex;gap:8px;justify-content:center;margin-bottom:16px}
-.tab{padding:10px 20px;background:#1a1a1a;border:none;border-radius:20px;color:#888;font-size:14px;font-weight:500}
-.tab.active{background:#e8c47c;color:#0a0a0a}
-.page{display:none}.page.active{display:block}
-.card{background:#141414;border-radius:14px;padding:16px;margin-bottom:12px}
-.card-title{font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px}
-.card-sub{font-size:13px;color:#888;margin-top:4px}
-.badge{padding:4px 10px;border-radius:10px;font-size:11px;background:#e8c47c22;color:#e8c47c}
-.btn{padding:12px 16px;background:#e8c47c;border:none;border-radius:12px;color:#0a0a0a;font-size:14px;font-weight:600;width:100%;margin-top:12px}
-.btn-sm{width:auto;padding:8px 14px;font-size:12px;margin-right:8px;margin-top:10px}
-.btn-danger{background:transparent;border:1px solid #e8646444;color:#e86464}
-.empty{text-align:center;padding:40px;color:#555;font-size:14px}
-.meter{background:linear-gradient(145deg,#1a1a1a,#141414);border-radius:16px;padding:20px;margin-bottom:20px;border:1px solid #252525}
-.meter-header{margin-bottom:16px}
-.meter-film{font-size:20px;font-weight:700;color:#e8c47c}
-.meter-iso{display:flex;align-items:center;gap:12px;margin-top:8px}
-.iso-box{background:#222;padding:8px 12px;border-radius:8px;font-size:14px}
-.iso-box .label{font-size:10px;color:#666;text-transform:uppercase}
-.iso-box .value{font-size:18px;font-weight:700;color:#f5f5f0}
-.iso-arrow{color:#666;font-size:18px}
-.iso-effective .value{color:#7ce87c}
-.compensation{background:#e8c47c;color:#0a0a0a;padding:6px 12px;border-radius:8px;font-size:16px;font-weight:700}
-.compensation.zero{background:#333;color:#888}
-.meter-details{font-size:12px;color:#666;margin-top:10px}
-.meter-details span{color:#888}
-.section-title{font-size:11px;color:#666;margin:14px 0 8px;text-transform:uppercase;letter-spacing:1px}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{padding:10px 14px;background:#1a1a1a;border:1px solid #333;border-radius:10px;color:#999;font-size:13px;font-weight:500}
-.chip.active{background:#e8c47c;color:#0a0a0a;border-color:#e8c47c}
-.results{margin-top:20px}
-.results-header{display:flex;padding:10px 12px;font-size:11px;color:#666;text-transform:uppercase;border-bottom:1px solid #222}
-.results-header div{flex:1;text-align:center}
-.result-row{display:flex;padding:14px 12px;border-bottom:1px solid #1a1a1a;align-items:center}
-.result-row:last-child{border-bottom:none}
-.result-cell{flex:1;text-align:center;font-size:15px}
-.result-cell.aperture{color:#7ca8e8;font-weight:600}
-.result-cell.speed{color:#f5f5f0}
-.result-cell.corrected{color:#e86464;font-size:13px}
-.result-cell.corrected.none{color:#555}
-.brand-header{font-size:12px;color:#e8c47c;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid #222;font-weight:600}
-.film-card{background:#141414;border-radius:12px;padding:14px;margin-bottom:8px}
-.film-card.selected{background:#1a1a0a;border:2px solid #e8c47c}
-.film-header{display:flex;justify-content:space-between;align-items:flex-start}
-.film-info h3{font-size:15px;font-weight:600}
-.film-info p{font-size:12px;color:#777;margin-top:3px}
-.film-compensation{font-size:14px;font-weight:700;padding:4px 10px;border-radius:6px;background:#7ce87c22;color:#7ce87c}
-.film-compensation.zero{background:#33333344;color:#666}
-.film-meta{display:flex;gap:16px;margin-top:10px;font-size:11px;color:#666}
-.film-meta span{display:flex;align-items:center;gap:4px}
-.film-tip{font-size:11px;color:#e8c47c;margin-top:8px;font-style:italic;padding-top:8px;border-top:1px solid #222}
-.film-btn{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;border:none;background:#e8c47c;color:#0a0a0a;margin-top:10px}
-.film-btn.active{background:#333;color:#e8c47c}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);align-items:flex-end;justify-content:center;z-index:100}
-.modal.open{display:flex}
-.modal-box{background:#141414;width:100%;max-width:400px;border-radius:20px 20px 0 0;padding:24px;max-height:85vh;overflow-y:auto}
-.modal-title{font-size:18px;font-weight:600;text-align:center;margin-bottom:20px}
-.form-group{margin-bottom:14px}
-.form-group label{display:block;font-size:11px;color:#666;margin-bottom:6px;text-transform:uppercase}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:14px;background:#1a1a1a;border:1px solid #333;border-radius:10px;color:#f5f5f0;font-size:16px}
-.form-group textarea{min-height:70px;resize:none}
-.form-row{display:flex;gap:12px}
-.form-row .form-group{flex:1}
-.form-actions{display:flex;gap:12px;margin-top:20px}
-.form-actions button{flex:1;padding:16px;border:none;border-radius:12px;font-size:15px;font-weight:600}
-.cancel-btn{background:#222;color:#f5f5f0}
-.save-btn{background:#e8c47c;color:#0a0a0a}
-.presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.preset{padding:6px 10px;background:#1a1a1a;border:1px solid #333;border-radius:10px;font-size:11px;color:#888}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>FilmLog</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: #1e1e1e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-tertiary: #666666;
+            --accent: #ff6b35;
+            --accent-dim: rgba(255, 107, 53, 0.15);
+            --border: #2a2a2a;
+            --success: #4ade80;
+            --warning: #fbbf24;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .header {
+            padding: 60px 20px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+        
+        .header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            padding: 0 20px;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            background: var(--accent);
+            color: white;
+        }
+        
+        /* Content */
+        .content {
+            flex: 1;
+            padding: 0 20px 100px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Film Database Tab */
+        .film-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .category-btn {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .category-btn.active {
+            background: var(--accent-dim);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        .film-grid {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .film-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .film-card:hover, .film-card.selected {
+            border-color: var(--accent);
+            background: var(--bg-tertiary);
+        }
+        
+        .film-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .film-name {
+            font-size: 17px;
+            font-weight: 600;
+        }
+        
+        .film-brand {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        
+        .film-iso-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        
+        .iso-box {
+            background: var(--bg-primary);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'SF Mono', monospace;
+        }
+        
+        .iso-effective {
+            font-size: 11px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .film-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
+        .film-tag {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+        }
+        
+        .film-tag.compensation {
+            background: var(--accent-dim);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        /* Meter Section */
+        .meter-section {
+            margin-top: 24px;
+            display: none;
+        }
+        
+        .meter-section.visible {
+            display: block;
+        }
+        
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        
+        .selected-film-banner {
+            background: linear-gradient(135deg, var(--accent-dim) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .selected-film-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .selected-film-info {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .selected-film-info span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .selected-film-info .accent {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .light-conditions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        
+        .light-btn {
+            padding: 14px 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 11px;
+            font-weight: 500;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .light-btn .icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .light-btn .ev-label {
+            font-size: 9px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+        }
+        
+        .light-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        
+        .light-btn.active .ev-label {
+            color: rgba(255,255,255,0.7);
+        }
+        
+        /* Results */
+        .results-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .results-ev {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .results-ev span {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        .exposure-grid {
+            display: grid;
+            gap: 8px;
+        }
+        
+        .exposure-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+        
+        .aperture {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: 'SF Mono', monospace;
+        }
+        
+        .shutter {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: 'SF Mono', monospace;
+        }
+        
+        .shutter.long-exposure {
+            color: var(--warning);
+        }
+        
+        /* Tips */
+        .tip-card {
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--accent);
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 16px;
+        }
+        
+        .tip-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        /* Rolls Tab */
+        .add-roll-btn {
+            width: 100%;
+            padding: 16px;
+            border: 2px dashed var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+        }
+        
+        .add-roll-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        .rolls-list {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .roll-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+        }
+        
+        .roll-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .roll-film-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .roll-camera {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .roll-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .roll-status.loaded {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--success);
+        }
+        
+        .roll-status.finished {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--warning);
+        }
+        
+        .roll-status.developed {
+            background: var(--accent-dim);
+            color: var(--accent);
+        }
+        
+        .roll-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .roll-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .roll-action-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .roll-action-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .roll-action-btn.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-width: 430px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-size: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 15px;
+            border-radius: 10px;
+        }
+        
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+        }
+        
+        .form-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-tertiary);
+        }
+        
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .empty-state p {
+            font-size: 14px;
+        }
+        
+        /* Source info */
+        .source-info {
+            margin-top: 20px;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            font-size: 11px;
+            color: var(--text-tertiary);
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-<h1>Film<span>Log</span></h1>
-<div class="tabs">
-<button class="tab active" id="tabRolls">Rolls</button>
-<button class="tab" id="tabFilms">Films</button>
-</div>
-<div class="page active" id="pageRolls">
-<div id="rollsList"></div>
-<button class="btn" id="btnAddRoll">+ Nouvelle pellicule</button>
-</div>
-<div class="page" id="pageFilms">
-<div class="meter" id="meterBox" style="display:none">
-<div class="meter-header">
-<div class="meter-film" id="mFilmName">—</div>
-<div class="meter-iso">
-<div class="iso-box">
-<div class="label">ISO Boîte</div>
-<div class="value" id="mISOBox">—</div>
-</div>
-<div class="iso-arrow">→</div>
-<div class="iso-box iso-effective">
-<div class="label">Mesurer à</div>
-<div class="value" id="mISOEff">—</div>
-</div>
-<div class="compensation" id="mComp">+1</div>
-</div>
-<div class="meter-details">
-<span id="mType">—</span> • Réciprocité P=<span id="mRecip">—</span> • <span id="mLat">—</span>
-</div>
-</div>
-<div class="section-title">Conditions de lumière</div>
-<div class="chips" id="lightChips"></div>
-<div class="results">
-<div class="results-header"><div>Ouverture</div><div>Vitesse</div><div>Réciprocité</div></div>
-<div id="resultsList"></div>
-</div>
-</div>
-<div class="section-title">Choisir un film</div>
-<div id="filmsList"></div>
-</div>
-<div class="modal" id="modalRoll">
-<div class="modal-box">
-<div class="modal-title">Nouvelle pellicule</div>
-<div class="form-group"><label>Appareil</label><select id="rCam"><option>Nikon S2</option><option>Voigtländer Bessa II</option><option>Autre</option></select></div>
-<div class="form-group"><label>Film</label><input type="text" id="rFilm" placeholder="Ex: Portra 400"><div class="presets" id="rPresets"></div></div>
-<div class="form-row">
-<div class="form-group"><label>ISO</label><select id="rISO"><option>50</option><option>100</option><option>160</option><option>200</option><option>400</option><option>800</option><option>1600</option><option>3200</option></select></div>
-<div class="form-group"><label>Format</label><select id="rFmt"><option>35mm</option><option>120</option></select></div>
-</div>
-<div class="form-group"><label>Notes</label><textarea id="rNotes" placeholder="Lieu, conditions..."></textarea></div>
-<div class="form-actions"><button class="cancel-btn" id="btnCancelRoll">Annuler</button><button class="save-btn" id="btnSaveRoll">Enregistrer</button></div>
-</div>
-</div>
-<script>
-var films = [
-{n:"Portra 160",iso:160,ei:100,comp:"+2/3",lat:[-1,3],p:1.0,th:10,t:"color",tip:"Surexposer 2/3 stop pour couleurs riches, quasi aucune réciprocité",b:"Kodak"},
-{n:"Portra 400",iso:400,ei:200,comp:"+1",lat:[-1,3],p:1.0,th:10,t:"color",tip:"LE film à surexposer ! +1 stop pour le look Portra crémeux",b:"Kodak"},
-{n:"Portra 800",iso:800,ei:400,comp:"+1",lat:[-1,2],p:1.0,th:10,t:"color",tip:"Surexposer +1, idéal basse lumière et tungstène",b:"Kodak"},
-{n:"Ektar 100",iso:100,ei:100,comp:"0",lat:[-1,2],p:1.15,th:1,t:"color",tip:"Box speed ! Très précis, peu tolérant à la sous-ex",b:"Kodak"},
-{n:"Gold 200",iso:200,ei:100,comp:"+1",lat:[-1,3],p:1.33,th:1,t:"color",tip:"Surexposer +1 pour tons chauds et dorés",b:"Kodak"},
-{n:"Ultramax 400",iso:400,ei:200,comp:"+1",lat:[-1,3],p:1.33,th:1,t:"color",tip:"Surexposer +1, bon rapport qualité/prix",b:"Kodak"},
-{n:"ColorPlus 200",iso:200,ei:100,comp:"+1",lat:[-1,3],p:1.33,th:1,t:"color",tip:"Surexposer +1, économique et fiable",b:"Kodak"},
-{n:"Tri-X 400",iso:400,ei:320,comp:"+1/3",lat:[-2,2],p:1.54,th:1,t:"bw",tip:"Légère surex +1/3. ATTENTION réciprocité forte !",b:"Kodak"},
-{n:"T-Max 100",iso:100,ei:100,comp:"0",lat:[-1,2],p:1.15,th:10,t:"bw",tip:"Box speed, grain ultra-fin, très précis",b:"Kodak"},
-{n:"T-Max 400",iso:400,ei:400,comp:"0",lat:[-1,2],p:1.24,th:10,t:"bw",tip:"Box speed, moderne et net, réciprocité faible",b:"Kodak"},
-{n:"T-Max P3200",iso:3200,ei:1600,comp:"+1",lat:[-1,1],p:1.15,th:10,t:"bw",tip:"Vrai ISO ~800-1000, surex +1, très pushable",b:"Kodak"},
-{n:"HP5 Plus 400",iso:400,ei:320,comp:"+1/3",lat:[-2,2],p:1.31,th:1,t:"bw",tip:"Surexposer +1/3, très tolérant, classique",b:"Ilford"},
-{n:"FP4 Plus 125",iso:125,ei:100,comp:"+1/3",lat:[-1,2],p:1.26,th:1,t:"bw",tip:"Surexposer +1/3, grain fin, excellent contraste",b:"Ilford"},
-{n:"Delta 100",iso:100,ei:100,comp:"0",lat:[-1,1],p:1.26,th:1,t:"bw",tip:"Box speed, T-grain ultra-fin, très précis",b:"Ilford"},
-{n:"Delta 400",iso:400,ei:320,comp:"+1/3",lat:[-1,2],p:1.41,th:1,t:"bw",tip:"Surexposer +1/3, moderne, réciprocité moyenne",b:"Ilford"},
-{n:"Delta 3200",iso:3200,ei:1600,comp:"+1",lat:[-1,2],p:1.33,th:1,t:"bw",tip:"Vrai ISO ~1000 ! Surexposer +1, pushable à 6400",b:"Ilford"},
-{n:"Pan F Plus 50",iso:50,ei:50,comp:"0",lat:[-1,1],p:1.33,th:1,t:"bw",tip:"Box speed, grain le plus fin, précision requise",b:"Ilford"},
-{n:"XP2 Super 400",iso:400,ei:200,comp:"+1",lat:[-1,3],p:1.31,th:1,t:"bw",tip:"Surexposer +1, process C-41, très tolérant",b:"Ilford"},
-{n:"SFX 200",iso:200,ei:200,comp:"0",lat:[-1,1],p:1.43,th:1,t:"bw",tip:"Box speed, effet infrarouge avec filtre rouge",b:"Ilford"},
-{n:"Ortho Plus 80",iso:80,ei:80,comp:"0",lat:[-1,1],p:1.25,th:1,t:"bw",tip:"Box speed, orthochromatique, pas de rouge",b:"Ilford"},
-{n:"Kentmere 100",iso:100,ei:100,comp:"0",lat:[-1,2],p:1.26,th:1,t:"bw",tip:"Box speed, économique, bon grain",b:"Harman"},
-{n:"Kentmere 400",iso:400,ei:320,comp:"+1/3",lat:[-1,2],p:1.30,th:1,t:"bw",tip:"Surexposer +1/3, économique et fiable",b:"Harman"},
-{n:"Phoenix 200",iso:200,ei:100,comp:"+1",lat:[-1,2],p:1.33,th:1,t:"color",tip:"Surexposer +1, look unique et vintage",b:"Harman"},
-{n:"Velvia 50",iso:50,ei:50,comp:"0",lat:[-0.5,0.5],p:1.40,th:4,t:"slide",tip:"DIAPO ! Box speed, exposition CRITIQUE ±0.5 stop",b:"Fujifilm"},
-{n:"Velvia 100",iso:100,ei:100,comp:"0",lat:[-0.5,0.5],p:1.40,th:4,t:"slide",tip:"DIAPO ! Box speed, exposition CRITIQUE ±0.5 stop",b:"Fujifilm"},
-{n:"Provia 100F",iso:100,ei:100,comp:"0",lat:[-0.5,0.5],p:1.33,th:1,t:"slide",tip:"DIAPO ! Box speed, couleurs naturelles, précis",b:"Fujifilm"},
-{n:"Acros II 100",iso:100,ei:100,comp:"0",lat:[-1,2],p:1.0,th:120,t:"bw",tip:"Box speed, AUCUNE réciprocité jusqu'à 2 minutes !",b:"Fujifilm"},
-{n:"Superia 400",iso:400,ei:200,comp:"+1",lat:[-1,2],p:1.33,th:1,t:"color",tip:"Surexposer +1, tons verts caractéristiques",b:"Fujifilm"},
-{n:"C200",iso:200,ei:100,comp:"+1",lat:[-1,2],p:1.33,th:1,t:"color",tip:"Surexposer +1, économique, tons frais",b:"Fujifilm"},
-{n:"800T",iso:800,ei:500,comp:"+2/3",lat:[-1,2],p:1.30,th:1,t:"color",tip:"Surexposer +2/3, tungstène, halation caractéristique",b:"CineStill"},
-{n:"400D",iso:400,ei:200,comp:"+1",lat:[-1,2],p:1.30,th:1,t:"color",tip:"Surexposer +1, daylight, halation douce",b:"CineStill"},
-{n:"50D",iso:50,ei:50,comp:"0",lat:[-1,2],p:1.30,th:1,t:"color",tip:"Box speed, ultra-fin, daylight",b:"CineStill"},
-{n:"Fomapan 100",iso:100,ei:80,comp:"+1/3",lat:[-1,2],p:1.35,th:1,t:"bw",tip:"Surexposer +1/3, look vintage, économique",b:"Fomapan"},
-{n:"Fomapan 200",iso:200,ei:160,comp:"+1/3",lat:[-1,2],p:1.35,th:1,t:"bw",tip:"Surexposer +1/3, polyvalent",b:"Fomapan"},
-{n:"Fomapan 400",iso:400,ei:320,comp:"+1/3",lat:[-1,2],p:1.35,th:1,t:"bw",tip:"Surexposer +1/3, grain prononcé, caractère",b:"Fomapan"},
-{n:"RPX 100",iso:100,ei:80,comp:"+1/3",lat:[-1,2],p:1.35,th:1,t:"bw",tip:"Surexposer +1/3, fin et contrasté",b:"Rollei"},
-{n:"RPX 400",iso:400,ei:320,comp:"+1/3",lat:[-1,2],p:1.35,th:1,t:"bw",tip:"Surexposer +1/3, polyvalent",b:"Rollei"},
-{n:"Infrared 400",iso:400,ei:400,comp:"0",lat:[-1,1],p:1.40,th:1,t:"bw",tip:"Box speed avec filtre R72, effet IR",b:"Rollei"}
-];
-var lights = [
-{ev:16,name:"Neige/Sable",desc:"Réflexion intense"},
-{ev:15,name:"Plein soleil",desc:"Ombres nettes"},
-{ev:14,name:"Soleil voilé",desc:"Ombres douces"},
-{ev:13,name:"Nuageux clair",desc:"Pas d'ombres"},
-{ev:12,name:"Nuageux",desc:"Couvert uniforme"},
-{ev:11,name:"Couvert sombre",desc:"Ciel gris"},
-{ev:10,name:"Ombre",desc:"Ombre en extérieur"},
-{ev:8,name:"Intérieur clair",desc:"Grande fenêtre"},
-{ev:6,name:"Intérieur",desc:"Éclairage normal"},
-{ev:4,name:"Intérieur sombre",desc:"Peu de lumière"},
-{ev:2,name:"Crépuscule",desc:"Juste après coucher"},
-{ev:0,name:"Nuit urbaine",desc:"Éclairage public"},
-{ev:-2,name:"Nuit noire",desc:"Lune, étoiles"}
-];
-var apertures = [1.4, 2, 2.8, 4, 5.6, 8, 11, 16, 22];
-var speeds = [
-{v:1/8000,l:"1/8000"},{v:1/4000,l:"1/4000"},{v:1/2000,l:"1/2000"},{v:1/1000,l:"1/1000"},
-{v:1/500,l:"1/500"},{v:1/250,l:"1/250"},{v:1/125,l:"1/125"},{v:1/60,l:"1/60"},
-{v:1/30,l:"1/30"},{v:1/15,l:"1/15"},{v:1/8,l:"1/8"},{v:1/4,l:"1/4"},
-{v:1/2,l:"1/2"},{v:1,l:"1s"},{v:2,l:"2s"},{v:4,l:"4s"},{v:8,l:"8s"},
-{v:15,l:"15s"},{v:30,l:"30s"},{v:60,l:"1min"},{v:120,l:"2min"},{v:300,l:"5min"}
-];
-var rolls = JSON.parse(localStorage.getItem("flr") || "[]");
-var currentFilm = null;
-var currentEV = 12;
-function getFilm(name) { return films.find(f => f.n === name) || null; }
-function calcReciprocity(t, film) { if (!film || t < film.th) return t; if (film.p === 1.0) return t; return Math.pow(t, film.p); }
-function formatTime(t) { if (t < 1) return "1/" + Math.round(1/t); if (t < 60) return Math.round(t) + "s"; var m = Math.floor(t/60), s = Math.round(t%60); if (m >= 60) { var h = Math.floor(m/60); m = m%60; return h+"h"+(m>0?m+"m":""); } return m + "min" + (s>0 ? s+"s" : ""); }
-function findNearestSpeed(t) { var best = speeds[0], minDiff = Infinity; for (var i=0; i<speeds.length; i++) { var diff = Math.abs(Math.log(t) - Math.log(speeds[i].v)); if (diff < minDiff) { minDiff = diff; best = speeds[i]; } } return minDiff < 0.5 ? best : null; }
-function showPage(p) { document.getElementById("tabRolls").className = p==="rolls" ? "tab active" : "tab"; document.getElementById("tabFilms").className = p==="films" ? "tab active" : "tab"; document.getElementById("pageRolls").className = p==="rolls" ? "page active" : "page"; document.getElementById("pageFilms").className = p==="films" ? "page active" : "page"; }
-document.getElementById("tabRolls").onclick = () => showPage("rolls");
-document.getElementById("tabFilms").onclick = () => { showPage("films"); renderFilms(); };
-document.getElementById("btnAddRoll").onclick = () => document.getElementById("modalRoll").className = "modal open";
-document.getElementById("btnCancelRoll").onclick = () => document.getElementById("modalRoll").className = "modal";
-document.getElementById("btnSaveRoll").onclick = function() { var r = { id: Date.now(), film: document.getElementById("rFilm").value || "Film", cam: document.getElementById("rCam").value, iso: document.getElementById("rISO").value, fmt: document.getElementById("rFmt").value, notes: document.getElementById("rNotes").value, st: "loaded" }; rolls.unshift(r); localStorage.setItem("flr", JSON.stringify(rolls)); document.getElementById("modalRoll").className = "modal"; document.getElementById("rFilm").value = ""; document.getElementById("rNotes").value = ""; renderRolls(); };
-function renderRolls() { var c = document.getElementById("rollsList"); if (rolls.length === 0) { c.innerHTML = '<div class="empty">Aucune pellicule chargée</div>'; return; } var h = ""; var states = {loaded:"En cours",exposed:"Exposée",lab:"Au labo",done:"Développée"}; var nextSt = {loaded:"exposed",exposed:"lab",lab:"done"}; var nextLbl = {loaded:"Exposée",exposed:"Au labo",lab:"Développée"}; rolls.forEach(r => { h += '<div class="card"><div class="card-title">'+r.film+'<span class="badge">'+states[r.st]+'</span></div><div class="card-sub">'+r.cam+' · ISO '+r.iso+' · '+r.fmt+'</div>'+(r.notes ? '<div style="margin-top:8px;font-size:12px;color:#666;font-style:italic">'+r.notes+'</div>' : '')+(nextSt[r.st] ? '<button class="btn btn-sm" onclick="advanceRoll('+r.id+')">→ '+nextLbl[r.st]+'</button>' : '')+'<button class="btn btn-sm btn-danger" onclick="deleteRoll('+r.id+')">Suppr</button></div>'; }); c.innerHTML = h; }
-window.advanceRoll = function(id) { var r = rolls.find(x => x.id === id); if (r) { if (r.st === "loaded") r.st = "exposed"; else if (r.st === "exposed") r.st = "lab"; else if (r.st === "lab") r.st = "done"; localStorage.setItem("flr", JSON.stringify(rolls)); renderRolls(); } };
-window.deleteRoll = function(id) { if (confirm("Supprimer cette pellicule ?")) { rolls = rolls.filter(x => x.id !== id); localStorage.setItem("flr", JSON.stringify(rolls)); renderRolls(); } };
-function renderFilms() { var brands = ["Kodak","Ilford","Harman","Fujifilm","CineStill","Fomapan","Rollei"]; var h = ""; brands.forEach(brand => { var bf = films.filter(f => f.b === brand); if (bf.length === 0) return; h += '<div class="brand-header">'+brand+'</div>'; bf.forEach(f => { var sel = currentFilm && currentFilm.n === f.n; var typeLbl = f.t==="bw" ? "N&B" : (f.t==="slide" ? "Diapo" : "Couleur"); var compClass = f.comp === "0" ? "zero" : ""; var latStr = "Lat: " + f.lat[0] + "/" + f.lat[1]; var pStr = f.p === 1.0 ? "aucune" : "P=" + f.p; h += '<div class="film-card'+(sel?' selected':'')+'"><div class="film-header"><div class="film-info"><h3>'+f.n+'</h3><p>ISO '+f.iso+' → mesurer à '+f.ei+'</p></div><div class="film-compensation '+compClass+'">'+(f.comp === "0" ? "0" : f.comp)+'</div></div><div class="film-meta"><span>'+typeLbl+'</span><span>'+latStr+' stops</span><span>Récip: '+pStr+'</span></div><div class="film-tip">'+f.tip+'</div><button class="film-btn'+(sel?' active':'')+'" onclick="selectFilm(\''+f.n+'\')">'+(sel?'✓ Actif':'Choisir')+'</button></div>'; }); }); document.getElementById("filmsList").innerHTML = h; }
-window.selectFilm = function(name) { currentFilm = getFilm(name); if (!currentFilm) return; document.getElementById("meterBox").style.display = "block"; document.getElementById("mFilmName").textContent = currentFilm.n; document.getElementById("mISOBox").textContent = currentFilm.iso; document.getElementById("mISOEff").textContent = currentFilm.ei; var compEl = document.getElementById("mComp"); compEl.textContent = currentFilm.comp === "0" ? "0" : currentFilm.comp; compEl.className = currentFilm.comp === "0" ? "compensation zero" : "compensation"; document.getElementById("mType").textContent = currentFilm.t==="bw"?"N&B":(currentFilm.t==="slide"?"Diapo":"Couleur"); document.getElementById("mRecip").textContent = currentFilm.p === 1.0 ? "aucune" : currentFilm.p; document.getElementById("mLat").textContent = "Latitude " + currentFilm.lat[0] + "/" + currentFilm.lat[1] + " stops"; renderLights(); renderResults(); renderFilms(); window.scrollTo({top:0,behavior:'smooth'}); };
-function renderLights() { var h = ""; lights.forEach(l => { h += '<span class="chip'+(l.ev===currentEV?' active':'')+'" onclick="setLight('+l.ev+')">'+l.name+'</span>'; }); document.getElementById("lightChips").innerHTML = h; }
-window.setLight = function(ev) { currentEV = ev; renderLights(); renderResults(); };
-function renderResults() { if (!currentFilm) { document.getElementById("resultsList").innerHTML = '<div class="empty">Sélectionnez un film</div>'; return; } var iso = currentFilm.ei; var evAtISO = currentEV + Math.log2(iso / 100); var h = ""; apertures.forEach(ap => { var t = (ap * ap) / Math.pow(2, evAtISO); var sp = findNearestSpeed(t); if (sp) { var corrected = calcReciprocity(sp.v, currentFilm); var needsCorr = corrected > sp.v * 1.1; var corrStr = needsCorr ? formatTime(corrected) : "—"; var corrClass = needsCorr ? "" : " none"; h += '<div class="result-row"><div class="result-cell aperture">f/'+ap+'</div><div class="result-cell speed">'+sp.l+'</div><div class="result-cell corrected'+corrClass+'">'+corrStr+'</div></div>'; } }); if (!h) h = '<div class="empty">Aucune combinaison valide</div>'; document.getElementById("resultsList").innerHTML = h; }
-function renderPresets() { var h = ""; films.slice(0,8).forEach(f => { h += '<span class="preset" onclick="setPreset(\''+f.n+'\','+f.iso+')">'+f.n+'</span>'; }); document.getElementById("rPresets").innerHTML = h; }
-window.setPreset = function(name, iso) { document.getElementById("rFilm").value = name; var sel = document.getElementById("rISO"); for (var i=0; i<sel.options.length; i++) { if (parseInt(sel.options[i].value) === iso) { sel.selectedIndex = i; break; } } };
-renderRolls();
-renderPresets();
-</script>
+    <div class="app-container">
+        <header class="header">
+            <h1>🎞️ FilmLog <span style="font-size: 14px; font-weight: 400; font-style: italic; color: var(--text-secondary);">by Stéphane Plovier</span></h1>
+            <p>Carnet du photographe argentique</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="rolls">Rolls</button>
+            <button class="tab" data-tab="films">Films</button>
+        </div>
+        
+        <main class="content">
+            <!-- Rolls Tab -->
+            <div class="tab-content active" id="rolls-tab">
+                <button class="add-roll-btn" onclick="openModal()">+ Nouvelle pellicule</button>
+                <div class="rolls-list" id="rolls-list">
+                    <div class="empty-state">
+                        <div class="icon">📷</div>
+                        <p>Aucune pellicule enregistrée<br>Ajoute ta première bobine !</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Films Database Tab -->
+            <div class="tab-content" id="films-tab">
+                <div class="film-categories">
+                    <button class="category-btn active" data-category="all">Tous</button>
+                    <button class="category-btn" data-category="color-neg">Couleur</button>
+                    <button class="category-btn" data-category="bw">N&B</button>
+                    <button class="category-btn" data-category="slide">Diapo</button>
+                </div>
+                
+                <div class="film-grid" id="film-grid"></div>
+                
+                <div class="meter-section" id="meter-section">
+                    <div class="section-title">Posemètre</div>
+                    
+                    <div class="selected-film-banner" id="selected-film-banner">
+                        <div class="selected-film-name" id="selected-film-name">-</div>
+                        <div class="selected-film-info">
+                            <span>ISO effectif: <span class="accent" id="selected-ei">-</span></span>
+                            <span>Compensation: <span class="accent" id="selected-comp">-</span></span>
+                        </div>
+                    </div>
+                    
+                    <div class="section-title">Conditions de lumière (EV @ ISO 100)</div>
+                    <div class="light-conditions">
+                        <button class="light-btn" data-ev="16"><div class="icon">🏖️</div>Neige/Sable<div class="ev-label">EV 16</div></button>
+                        <button class="light-btn" data-ev="15"><div class="icon">☀️</div>Plein soleil<div class="ev-label">EV 15</div></button>
+                        <button class="light-btn" data-ev="14"><div class="icon">🌤️</div>Soleil voilé<div class="ev-label">EV 14</div></button>
+                        <button class="light-btn" data-ev="13"><div class="icon">⛅</div>Nuageux clair<div class="ev-label">EV 13</div></button>
+                        <button class="light-btn" data-ev="12"><div class="icon">☁️</div>Couvert<div class="ev-label">EV 12</div></button>
+                        <button class="light-btn" data-ev="12" data-variant="shade"><div class="icon">🌳</div>Ombre ouverte<div class="ev-label">EV 12</div></button>
+                        <button class="light-btn" data-ev="7"><div class="icon">🏛️</div>Intérieur clair<div class="ev-label">EV 7</div></button>
+                        <button class="light-btn" data-ev="6"><div class="icon">🏠</div>Intérieur<div class="ev-label">EV 5-7</div></button>
+                        <button class="light-btn" data-ev="4"><div class="icon">🌙</div>Sombre<div class="ev-label">EV 4-5</div></button>
+                    </div>
+                    
+                    <div class="results-card" id="results-card" style="display: none;">
+                        <div class="results-header">
+                            <div class="results-ev">EV <span id="ev-display">-</span></div>
+                            <div style="font-size: 12px; color: var(--text-tertiary);" id="reciprocity-note"></div>
+                        </div>
+                        <div class="exposure-grid" id="exposure-grid"></div>
+                    </div>
+                    
+                    <div class="tip-card" id="tip-card" style="display: none;">
+                        <p id="tip-text"></p>
+                    </div>
+                    
+                    <div class="source-info">
+                        Valeurs EV basées sur ANSI PH2.7-1986 / ISO 2720
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Add Roll Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Nouvelle pellicule</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Pellicule</label>
+                <select class="form-select" id="roll-film"></select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Appareil</label>
+                <input type="text" class="form-input" id="roll-camera" placeholder="Ex: Nikon S2, Bessa II...">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Date de chargement</label>
+                <input type="date" class="form-input" id="roll-date">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Notes (optionnel)</label>
+                <input type="text" class="form-input" id="roll-notes" placeholder="Lieu, projet, etc.">
+            </div>
+            
+            <button class="form-btn" onclick="saveRoll()">Ajouter la pellicule</button>
+        </div>
+    </div>
+    
+    <script>
+        // ===========================================
+        // FILM DATABASE avec données corrigées
+        // ===========================================
+        const films = [
+            // KODAK COLOR
+            { id: 'portra160', name: 'Portra 160', brand: 'Kodak', iso: 160, ei: 100, category: 'color-neg', compensation: '+2/3', p: 1.0, tip: 'Surexposer de 2/3 stop. Magnifique pour les portraits, tons chair exceptionnels. Aucune correction de réciprocité nécessaire.' },
+            { id: 'portra400', name: 'Portra 400', brand: 'Kodak', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.0, tip: 'Surexposer d\'1 stop. Le film pro le plus polyvalent. Latitude énorme, parfait pour la lumière naturelle variable.' },
+            { id: 'portra800', name: 'Portra 800', brand: 'Kodak', iso: 800, ei: 400, category: 'color-neg', compensation: '+1', p: 1.0, tip: 'Surexposer d\'1 stop. Idéal pour l\'intérieur et la basse lumière. Grain fin pour un 800 ISO.' },
+            { id: 'ektar100', name: 'Ektar 100', brand: 'Kodak', iso: 100, ei: 100, category: 'color-neg', compensation: '0', p: 1.15, tip: 'Exposer à l\'ISO boîte. Grain ultra-fin, couleurs saturées. Parfait pour le paysage. Légère réciprocité.' },
+            { id: 'gold200', name: 'Gold 200', brand: 'Kodak', iso: 200, ei: 100, category: 'color-neg', compensation: '+1', p: 1.33, tip: 'Surexposer d\'1 stop. Tons chauds vintage, excellent rapport qualité/prix. Réciprocité moyenne.' },
+            { id: 'ultramax400', name: 'Ultramax 400', brand: 'Kodak', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.33, tip: 'Surexposer d\'1 stop. Polyvalent et abordable, bon pour débuter. Réciprocité moyenne.' },
+            { id: 'colorplus200', name: 'ColorPlus 200', brand: 'Kodak', iso: 200, ei: 100, category: 'color-neg', compensation: '+1', p: 1.33, tip: 'Surexposer d\'1 stop. Budget friendly, rendu nostalgique.' },
+            
+            // KODAK B&W
+            { id: 'trix400', name: 'Tri-X 400', brand: 'Kodak', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.54, tip: 'Surexposer de 1/3 stop. LE film N&B légendaire. Attention: réciprocité forte! 1min mesurée → ~9min corrigée.' },
+            { id: 'tmax100', name: 'T-Max 100', brand: 'Kodak', iso: 100, ei: 100, category: 'bw', compensation: '0', p: 1.15, tip: 'Exposer à l\'ISO boîte. Grain tabulaire ultra-fin, excellent piqué. Faible réciprocité.' },
+            { id: 'tmax400', name: 'T-Max 400', brand: 'Kodak', iso: 400, ei: 400, category: 'bw', compensation: '0', p: 1.24, tip: 'Exposer à l\'ISO boîte. Grain fin pour un 400. Réciprocité modérée.' },
+            { id: 'doublex', name: 'Double-X 5222', brand: 'Kodak', iso: 250, ei: 200, category: 'bw', compensation: '+1/3', p: 1.40, tip: 'Film cinéma, rendu classique Hollywood. Réciprocité notable.' },
+            
+            // ILFORD
+            { id: 'hp5', name: 'HP5 Plus 400', brand: 'Ilford', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.31, tip: 'Surexposer de 1/3 stop. Polyvalent et tolérant, énorme latitude d\'exposition.' },
+            { id: 'fp4', name: 'FP4 Plus 125', brand: 'Ilford', iso: 125, ei: 100, category: 'bw', compensation: '+1/3', p: 1.26, tip: 'Surexposer de 1/3 stop. Grain très fin, excellent pour le portrait et le paysage.' },
+            { id: 'delta100', name: 'Delta 100', brand: 'Ilford', iso: 100, ei: 100, category: 'bw', compensation: '0', p: 1.26, tip: 'Exposer à l\'ISO boîte. Grain tabulaire ultra-fin, très haut piqué.' },
+            { id: 'delta400', name: 'Delta 400', brand: 'Ilford', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.41, tip: 'Surexposer de 1/3 stop. Grain fin et moderne.' },
+            { id: 'delta3200', name: 'Delta 3200', brand: 'Ilford', iso: 3200, ei: 1600, category: 'bw', compensation: '+1', p: 1.33, tip: 'ISO réel ~1000. Surexposer d\'1 stop minimum. Pour la basse lumière extrême.' },
+            { id: 'panf50', name: 'Pan F Plus 50', brand: 'Ilford', iso: 50, ei: 50, category: 'bw', compensation: '0', p: 1.33, tip: 'Le grain le plus fin d\'Ilford. Pour les agrandissements géants.' },
+            { id: 'xp2', name: 'XP2 Super 400', brand: 'Ilford', iso: 400, ei: 200, category: 'bw', compensation: '+1', p: 1.31, tip: 'Surexposer d\'1 stop. N&B chromogène, développement C-41. Très grande latitude.' },
+            { id: 'sfx200', name: 'SFX 200', brand: 'Ilford', iso: 200, ei: 200, category: 'bw', compensation: '0', p: 1.30, tip: 'Sensibilité infrarouge étendue. Avec filtre rouge pour effet IR.' },
+            
+            // FUJIFILM
+            { id: 'velvia50', name: 'Velvia 50', brand: 'Fujifilm', iso: 50, ei: 50, category: 'slide', compensation: '0', p: 1.40, tip: '⚠️ DIAPO: Latitude ±0.5 stop seulement! Couleurs ultra-saturées, idéal paysage. Réciprocité notable.' },
+            { id: 'velvia100', name: 'Velvia 100', brand: 'Fujifilm', iso: 100, ei: 100, category: 'slide', compensation: '0', p: 1.40, tip: '⚠️ DIAPO: Latitude ±0.5 stop seulement! Saturation extrême pour paysages vibrants.' },
+            { id: 'provia100f', name: 'Provia 100F', brand: 'Fujifilm', iso: 100, ei: 100, category: 'slide', compensation: '0', p: 1.33, tip: '⚠️ DIAPO: Exposition critique! Couleurs naturelles, polyvalent.' },
+            { id: 'acros100ii', name: 'Acros II 100', brand: 'Fujifilm', iso: 100, ei: 100, category: 'bw', compensation: '0', p: 1.0, tip: 'EXCEPTIONNEL: Aucune réciprocité jusqu\'à 2 minutes! Parfait pour les poses longues.' },
+            { id: 'superia400', name: 'Superia X-TRA 400', brand: 'Fujifilm', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.33, tip: 'Surexposer d\'1 stop. Tons verts caractéristiques Fuji. Polyvalent.' },
+            { id: 'c200', name: 'C200', brand: 'Fujifilm', iso: 200, ei: 100, category: 'color-neg', compensation: '+1', p: 1.33, tip: 'Surexposer d\'1 stop. Film budget avec rendu agréable.' },
+            
+            // CINESTILL
+            { id: 'cinestill800t', name: '800T', brand: 'CineStill', iso: 800, ei: 500, category: 'color-neg', compensation: '+2/3', p: 1.30, tip: 'Surexposer de 2/3 stop. Film tungstène, halos caractéristiques. Magique de nuit.' },
+            { id: 'cinestill400d', name: '400D', brand: 'CineStill', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.30, tip: 'Surexposer d\'1 stop. Version lumière du jour du film cinéma.' },
+            { id: 'cinestill50d', name: '50D', brand: 'CineStill', iso: 50, ei: 50, category: 'color-neg', compensation: '0', p: 1.30, tip: 'Film cinéma grain ultra-fin. Pour la lumière du jour.' },
+            
+            // FOMAPAN
+            { id: 'fomapan100', name: 'Fomapan 100', brand: 'Foma', iso: 100, ei: 80, category: 'bw', compensation: '+1/3', p: 1.40, tip: 'Film tchèque économique. Rendu classique, grain prononcé.' },
+            { id: 'fomapan200', name: 'Fomapan 200', brand: 'Foma', iso: 200, ei: 160, category: 'bw', compensation: '+1/3', p: 1.40, tip: 'Bon compromis vitesse/grain. Prix attractif.' },
+            { id: 'fomapan400', name: 'Fomapan 400', brand: 'Foma', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.40, tip: 'Le plus rapide des Fomapan. Grain caractéristique.' },
+            
+            // ROLLEI
+            { id: 'rpx100', name: 'RPX 100', brand: 'Rollei', iso: 100, ei: 100, category: 'bw', compensation: '0', p: 1.26, tip: 'Grain fin, bonne latitude. Alternative aux grands noms.' },
+            { id: 'rpx400', name: 'RPX 400', brand: 'Rollei', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.31, tip: 'Polyvalent, grain contrôlé.' },
+            { id: 'infrared400', name: 'Infrared 400', brand: 'Rollei', iso: 400, ei: 400, category: 'bw', compensation: '0', p: 1.30, tip: 'Vrai film infrarouge. Utiliser avec filtre IR pour l\'effet Wood.' },
+            
+            // KENTMERE / HARMAN
+            { id: 'kentmere100', name: 'Kentmere 100', brand: 'Kentmere', iso: 100, ei: 80, category: 'bw', compensation: '+1/3', p: 1.30, tip: 'Par Harman (Ilford). Excellent rapport qualité/prix.' },
+            { id: 'kentmere400', name: 'Kentmere 400', brand: 'Kentmere', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.30, tip: 'Alternative économique au HP5.' },
+            
+            // LOMOGRAPHY
+            { id: 'lomo100', name: 'Color 100', brand: 'Lomography', iso: 100, ei: 80, category: 'color-neg', compensation: '+1/3', p: 1.33, tip: 'Couleurs saturées "lomo". Pour l\'expérimentation.' },
+            { id: 'lomo400', name: 'Color 400', brand: 'Lomography', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.33, tip: 'Polyvalent avec le rendu Lomo caractéristique.' },
+            { id: 'lomo800', name: 'Color 800', brand: 'Lomography', iso: 800, ei: 400, category: 'color-neg', compensation: '+1', p: 1.33, tip: 'Pour la basse lumière, grain créatif.' },
+        ];
+        
+        // ===========================================
+        // APP STATE
+        // ===========================================
+        let rolls = JSON.parse(localStorage.getItem('filmlog_rolls') || '[]');
+        let selectedFilm = null;
+        let selectedEV = null;
+        
+        // ===========================================
+        // TAB NAVIGATION
+        // ===========================================
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+            });
+        });
+        
+        // ===========================================
+        // FILM DATABASE RENDERING
+        // ===========================================
+        function renderFilms(category = 'all') {
+            const grid = document.getElementById('film-grid');
+            const filtered = category === 'all' ? films : films.filter(f => f.category === category);
+            
+            grid.innerHTML = filtered.map(film => `
+                <div class="film-card ${selectedFilm?.id === film.id ? 'selected' : ''}" onclick="selectFilm('${film.id}')">
+                    <div class="film-card-header">
+                        <div>
+                            <div class="film-name">${film.name}</div>
+                            <div class="film-brand">${film.brand}</div>
+                        </div>
+                        <div class="film-iso-badge">
+                            <div class="iso-box">ISO ${film.iso}</div>
+                            ${film.ei !== film.iso ? `<div class="iso-effective">→ EI ${film.ei}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="film-tags">
+                        ${film.compensation !== '0' ? `<span class="film-tag compensation">${film.compensation} stop</span>` : '<span class="film-tag">Box speed</span>'}
+                        <span class="film-tag">${getCategoryLabel(film.category)}</span>
+                        ${film.p === 1.0 ? '<span class="film-tag">Pas de récip.</span>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getCategoryLabel(cat) {
+            const labels = { 'color-neg': 'Négatif couleur', 'bw': 'Noir & Blanc', 'slide': 'Diapositive' };
+            return labels[cat] || cat;
+        }
+        
+        // Category filters
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderFilms(btn.dataset.category);
+            });
+        });
+        
+        // ===========================================
+        // FILM SELECTION & METER
+        // ===========================================
+        function selectFilm(filmId) {
+            selectedFilm = films.find(f => f.id === filmId);
+            renderFilms(document.querySelector('.category-btn.active').dataset.category);
+            
+            document.getElementById('meter-section').classList.add('visible');
+            document.getElementById('selected-film-name').textContent = `${selectedFilm.brand} ${selectedFilm.name}`;
+            document.getElementById('selected-ei').textContent = selectedFilm.ei;
+            document.getElementById('selected-comp').textContent = selectedFilm.compensation !== '0' ? selectedFilm.compensation : 'Aucune';
+            
+            // Reset light selection
+            document.querySelectorAll('.light-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('results-card').style.display = 'none';
+            document.getElementById('tip-card').style.display = 'none';
+            selectedEV = null;
+            
+            // Scroll to meter
+            document.getElementById('meter-section').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Light condition selection
+        document.querySelectorAll('.light-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.light-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedEV = parseInt(btn.dataset.ev);
+                calculateExposure();
+            });
+        });
+        
+        // ===========================================
+        // EXPOSURE CALCULATION (ANSI EV100 based)
+        // ===========================================
+        function calculateExposure() {
+            if (!selectedFilm || selectedEV === null) return;
+            
+            // Les EV dans les boutons sont des EV100 (à ISO 100)
+            // Pour un film avec un ISO effectif différent, on ajuste :
+            // EV_film = EV100 + log2(ISO_effectif / 100)
+            const evAdjusted = selectedEV + Math.log2(selectedFilm.ei / 100);
+            
+            document.getElementById('ev-display').textContent = evAdjusted.toFixed(1);
+            document.getElementById('results-card').style.display = 'block';
+            
+            // Afficher tip
+            document.getElementById('tip-card').style.display = 'block';
+            document.getElementById('tip-text').textContent = selectedFilm.tip;
+            
+            // Note réciprocité si applicable
+            const recipNote = document.getElementById('reciprocity-note');
+            if (selectedFilm.p > 1.0 && evAdjusted < 5) {
+                recipNote.textContent = `Réciprocité: p=${selectedFilm.p}`;
+            } else {
+                recipNote.textContent = '';
+            }
+            
+            // Calculer les couples ouverture/vitesse
+            const apertures = [1.4, 2, 2.8, 4, 5.6, 8, 11, 16];
+            const grid = document.getElementById('exposure-grid');
+            
+            grid.innerHTML = apertures.map(ap => {
+                // Formule: EV = log2(N² / t) donc t = N² / 2^EV
+                const shutterSeconds = Math.pow(ap, 2) / Math.pow(2, evAdjusted);
+                
+                // Appliquer la réciprocité si nécessaire (poses > 1s)
+                let correctedShutter = shutterSeconds;
+                let isLongExposure = false;
+                
+                if (shutterSeconds > 1 && selectedFilm.p > 1.0) {
+                    correctedShutter = Math.pow(shutterSeconds, selectedFilm.p);
+                    isLongExposure = true;
+                }
+                
+                const shutterDisplay = formatShutter(correctedShutter);
+                
+                return `
+                    <div class="exposure-row">
+                        <span class="aperture">f/${ap}</span>
+                        <span class="shutter ${isLongExposure ? 'long-exposure' : ''}">${shutterDisplay}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function formatShutter(seconds) {
+            if (seconds >= 60) {
+                const mins = Math.round(seconds / 60);
+                return `${mins}min`;
+            } else if (seconds >= 1) {
+                return `${seconds.toFixed(1)}s`;
+            } else {
+                // Trouver la vitesse standard la plus proche
+                const speeds = [8000, 4000, 2000, 1000, 500, 250, 125, 60, 30, 15, 8, 4, 2];
+                const fraction = 1 / seconds;
+                const closest = speeds.reduce((prev, curr) => 
+                    Math.abs(curr - fraction) < Math.abs(prev - fraction) ? curr : prev
+                );
+                return `1/${closest}`;
+            }
+        }
+        
+        // ===========================================
+        // ROLLS MANAGEMENT
+        // ===========================================
+        function renderRolls() {
+            const list = document.getElementById('rolls-list');
+            
+            if (rolls.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📷</div>
+                        <p>Aucune pellicule enregistrée<br>Ajoute ta première bobine !</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = rolls.map((roll, index) => {
+                const film = films.find(f => f.id === roll.filmId) || { name: roll.filmId, brand: '' };
+                return `
+                    <div class="roll-card">
+                        <div class="roll-header">
+                            <div>
+                                <div class="roll-film-name">${film.brand} ${film.name}</div>
+                                <div class="roll-camera">${roll.camera || 'Appareil non spécifié'}</div>
+                            </div>
+                            <span class="roll-status ${roll.status}">${getStatusLabel(roll.status)}</span>
+                        </div>
+                        <div class="roll-meta">
+                            <span>📅 ${formatDate(roll.date)}</span>
+                            ${roll.frames ? `<span>🎞️ ${roll.frames} poses</span>` : ''}
+                        </div>
+                        ${roll.notes ? `<div class="roll-meta" style="margin-top: 8px;"><span>📝 ${roll.notes}</span></div>` : ''}
+                        <div class="roll-actions">
+                            <button class="roll-action-btn" onclick="cycleStatus(${index})">Changer statut</button>
+                            <button class="roll-action-btn" onclick="deleteRoll(${index})">Supprimer</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function getStatusLabel(status) {
+            const labels = { loaded: 'Chargée', finished: 'Terminée', developed: 'Développée' };
+            return labels[status] || status;
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+        
+        function cycleStatus(index) {
+            const statuses = ['loaded', 'finished', 'developed'];
+            const current = statuses.indexOf(rolls[index].status);
+            rolls[index].status = statuses[(current + 1) % statuses.length];
+            saveRolls();
+            renderRolls();
+        }
+        
+        function deleteRoll(index) {
+            if (confirm('Supprimer cette pellicule ?')) {
+                rolls.splice(index, 1);
+                saveRolls();
+                renderRolls();
+            }
+        }
+        
+        function saveRolls() {
+            localStorage.setItem('filmlog_rolls', JSON.stringify(rolls));
+        }
+        
+        // ===========================================
+        // MODAL
+        // ===========================================
+        function openModal() {
+            const select = document.getElementById('roll-film');
+            select.innerHTML = films.map(f => 
+                `<option value="${f.id}">${f.brand} ${f.name} (ISO ${f.iso})</option>`
+            ).join('');
+            
+            document.getElementById('roll-date').valueAsDate = new Date();
+            document.getElementById('roll-camera').value = '';
+            document.getElementById('roll-notes').value = '';
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+        
+        function saveRoll() {
+            const roll = {
+                filmId: document.getElementById('roll-film').value,
+                camera: document.getElementById('roll-camera').value,
+                date: document.getElementById('roll-date').value,
+                notes: document.getElementById('roll-notes').value,
+                status: 'loaded',
+                frames: 0
+            };
+            
+            rolls.unshift(roll);
+            saveRolls();
+            renderRolls();
+            closeModal();
+        }
+        
+        // Close modal on overlay click
+        document.getElementById('modal-overlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modal-overlay')) {
+                closeModal();
+            }
+        });
+        
+        // ===========================================
+        // INIT
+        // ===========================================
+        renderFilms();
+        renderRolls();
+    </script>
 </body>
 </html>
