@@ -2,54 +2,490 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>FilmLog</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif;background:#0a0a0a;color:#f5f5f0;padding:20px;min-height:100vh;padding-bottom:100px}h1{text-align:center;font-size:24px;margin-bottom:20px}h1 span{color:#e8c47c}.tabs{display:flex;gap:8px;justify-content:center;margin-bottom:20px}.tab{padding:10px 16px;background:#1a1a1a;border:none;border-radius:20px;color:#888;font-size:13px}.tab.active{background:#e8c47c;color:#0a0a0a}.page{display:none}.page.active{display:block}.card{background:#141414;border-radius:12px;padding:16px;margin-bottom:12px}.card-title{font-size:16px;font-weight:600}.card-sub{font-size:13px;color:#888;margin-top:4px}.badge{display:inline-block;padding:4px 10px;border-radius:10px;font-size:11px;background:#e8c47c33;color:#e8c47c;margin-left:8px}.btn{padding:10px 16px;background:#e8c47c;border:none;border-radius:10px;color:#0a0a0a;font-size:14px;font-weight:600;margin-top:12px;width:100%}.btn-sm{width:auto;padding:8px 14px;font-size:12px;margin-right:8px;margin-top:10px}.btn-danger{background:transparent;border:1px solid #e8646433;color:#e86464}.empty{text-align:center;padding:40px;color:#666}.meter-ev{text-align:center;padding:20px 0}.meter-ev-val{font-size:48px;color:#e8c47c}.chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.chip{padding:8px 14px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#888;font-size:13px}.chip.active{background:#f5f5f0;color:#0a0a0a;border-color:#f5f5f0}.chip.accent{background:#e8c47c;color:#0a0a0a;border-color:#e8c47c}.combo{display:flex;border-bottom:1px solid #222}.combo-cell{flex:1;padding:12px;text-align:center;font-size:15px}.combo-cell.ap{color:#7ca8e8}.combo-cell.sp{color:#e8a84c}.combo-cell.corrected{color:#e86464;font-size:12px}.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);align-items:flex-end;justify-content:center;z-index:100}.modal.open{display:flex}.modal-box{background:#141414;width:100%;max-width:400px;border-radius:20px 20px 0 0;padding:24px;max-height:90vh;overflow-y:auto}.modal-title{font-size:18px;font-weight:600;text-align:center;margin-bottom:20px}.form-group{margin-bottom:14px}.form-group label{display:block;font-size:11px;color:#666;margin-bottom:6px}.form-group input,.form-group select,.form-group textarea{width:100%;padding:12px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#f5f5f0;font-size:15px}.form-group textarea{min-height:60px;resize:none}.form-row{display:flex;gap:12px}.form-row .form-group{flex:1}.form-actions{display:flex;gap:12px;margin-top:20px}.form-actions button{flex:1;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:600}.cancel-btn{background:#1a1a1a;color:#f5f5f0}.save-btn{background:#e8c47c;color:#0a0a0a}.presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.preset{padding:6px 10px;background:#1a1a1a;border:1px solid #333;border-radius:12px;font-size:11px;color:#888}.section-title{font-size:11px;color:#666;margin:16px 0 8px;text-transform:uppercase}.film-card{background:#141414;border-radius:12px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}.film-card.selected{border:1px solid #e8c47c}.film-info h3{font-size:15px;font-weight:600}.film-info p{font-size:12px;color:#888;margin-top:2px}.film-actions{display:flex;gap:8px}.film-btn{padding:6px 12px;border-radius:8px;font-size:11px;border:none;cursor:pointer}.film-btn.select{background:#e8c47c;color:#0a0a0a}.film-btn.select.selected{background:#333;color:#e8c47c}.film-btn.delete{background:transparent;border:1px solid #e8646433;color:#e86464}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#0a0a0a;color:#f5f5f0;min-height:100vh;padding:16px;padding-bottom:120px}
+h1{text-align:center;font-size:22px;margin-bottom:16px;font-weight:600}
+h1 span{color:#e8c47c}
+.tabs{display:flex;gap:8px;justify-content:center;margin-bottom:16px}
+.tab{padding:10px 20px;background:#1a1a1a;border:none;border-radius:20px;color:#888;font-size:14px;font-weight:500}
+.tab.active{background:#e8c47c;color:#0a0a0a}
+.page{display:none}.page.active{display:block}
+.card{background:#141414;border-radius:14px;padding:16px;margin-bottom:12px}
+.card-title{font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-sub{font-size:13px;color:#888;margin-top:4px}
+.badge{padding:4px 10px;border-radius:10px;font-size:11px;background:#e8c47c22;color:#e8c47c}
+.btn{padding:12px 16px;background:#e8c47c;border:none;border-radius:12px;color:#0a0a0a;font-size:14px;font-weight:600;width:100%;margin-top:12px}
+.btn-sm{width:auto;padding:8px 14px;font-size:12px;margin-right:8px;margin-top:10px}
+.btn-danger{background:transparent;border:1px solid #e8646444;color:#e86464}
+.empty{text-align:center;padding:40px;color:#555;font-size:14px}
+
+/* Posemètre intégré */
+.meter{background:linear-gradient(145deg,#1a1a1a,#141414);border-radius:16px;padding:20px;margin-bottom:20px;border:1px solid #252525}
+.meter-header{margin-bottom:16px}
+.meter-film{font-size:20px;font-weight:700;color:#e8c47c}
+.meter-iso{display:flex;align-items:center;gap:12px;margin-top:8px}
+.iso-box{background:#222;padding:8px 12px;border-radius:8px;font-size:14px}
+.iso-box .label{font-size:10px;color:#666;text-transform:uppercase}
+.iso-box .value{font-size:18px;font-weight:700;color:#f5f5f0}
+.iso-arrow{color:#666;font-size:18px}
+.iso-effective .value{color:#7ce87c}
+.compensation{background:#e8c47c;color:#0a0a0a;padding:6px 12px;border-radius:8px;font-size:16px;font-weight:700}
+.compensation.zero{background:#333;color:#888}
+.meter-details{font-size:12px;color:#666;margin-top:10px}
+.meter-details span{color:#888}
+
+.section-title{font-size:11px;color:#666;margin:14px 0 8px;text-transform:uppercase;letter-spacing:1px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:10px 14px;background:#1a1a1a;border:1px solid #333;border-radius:10px;color:#999;font-size:13px;font-weight:500}
+.chip.active{background:#e8c47c;color:#0a0a0a;border-color:#e8c47c}
+.results{margin-top:20px}
+.results-header{display:flex;padding:10px 12px;font-size:11px;color:#666;text-transform:uppercase;border-bottom:1px solid #222}
+.results-header div{flex:1;text-align:center}
+.result-row{display:flex;padding:14px 12px;border-bottom:1px solid #1a1a1a;align-items:center}
+.result-row:last-child{border-bottom:none}
+.result-cell{flex:1;text-align:center;font-size:15px}
+.result-cell.aperture{color:#7ca8e8;font-weight:600}
+.result-cell.speed{color:#f5f5f0}
+.result-cell.corrected{color:#e86464;font-size:13px}
+.result-cell.corrected.none{color:#555}
+
+/* Films */
+.brand-header{font-size:12px;color:#e8c47c;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid #222;font-weight:600}
+.film-card{background:#141414;border-radius:12px;padding:14px;margin-bottom:8px}
+.film-card.selected{background:#1a1a0a;border:2px solid #e8c47c}
+.film-header{display:flex;justify-content:space-between;align-items:flex-start}
+.film-info h3{font-size:15px;font-weight:600}
+.film-info p{font-size:12px;color:#777;margin-top:3px}
+.film-compensation{font-size:14px;font-weight:700;padding:4px 10px;border-radius:6px;background:#7ce87c22;color:#7ce87c}
+.film-compensation.zero{background:#33333344;color:#666}
+.film-meta{display:flex;gap:16px;margin-top:10px;font-size:11px;color:#666}
+.film-meta span{display:flex;align-items:center;gap:4px}
+.film-tip{font-size:11px;color:#e8c47c;margin-top:8px;font-style:italic;padding-top:8px;border-top:1px solid #222}
+.film-btn{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;border:none;background:#e8c47c;color:#0a0a0a;margin-top:10px}
+.film-btn.active{background:#333;color:#e8c47c}
+
+/* Modal */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);align-items:flex-end;justify-content:center;z-index:100}
+.modal.open{display:flex}
+.modal-box{background:#141414;width:100%;max-width:400px;border-radius:20px 20px 0 0;padding:24px;max-height:85vh;overflow-y:auto}
+.modal-title{font-size:18px;font-weight:600;text-align:center;margin-bottom:20px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:11px;color:#666;margin-bottom:6px;text-transform:uppercase}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:14px;background:#1a1a1a;border:1px solid #333;border-radius:10px;color:#f5f5f0;font-size:16px}
+.form-group textarea{min-height:70px;resize:none}
+.form-row{display:flex;gap:12px}
+.form-row .form-group{flex:1}
+.form-actions{display:flex;gap:12px;margin-top:20px}
+.form-actions button{flex:1;padding:16px;border:none;border-radius:12px;font-size:15px;font-weight:600}
+.cancel-btn{background:#222;color:#f5f5f0}
+.save-btn{background:#e8c47c;color:#0a0a0a}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.preset{padding:6px 10px;background:#1a1a1a;border:1px solid #333;border-radius:10px;font-size:11px;color:#888}
 </style>
 </head>
 <body>
 <h1>Film<span>Log</span></h1>
-<div class="tabs"><button class="tab active" id="tabRolls">Rolls</button><button class="tab" id="tabMeter">Posemetre</button><button class="tab" id="tabFilms">Films</button></div>
-<div class="page active" id="pageRolls"><div id="rollsList"></div><button class="btn" id="btnAdd">+ Nouvelle pellicule</button></div>
-<div class="page" id="pageMeter"><div class="meter-ev"><div class="meter-ev-val" id="evVal">12</div><div style="font-size:12px;color:#666;margin-top:8px">EV</div></div><div class="section-title">Film actif : <span id="activeFilmName" style="color:#e8c47c">Portra 400</span></div><div class="section-title">Scene</div><div class="chips" id="sceneChips"></div><div class="section-title">ISO</div><div class="chips" id="isoChips"></div><div style="background:#141414;border-radius:12px;overflow:hidden;margin-top:16px"><div class="combo" style="border-bottom:1px solid #333"><div class="combo-cell" style="font-size:11px;color:#666">Ouverture</div><div class="combo-cell" style="font-size:11px;color:#666">Vitesse</div><div class="combo-cell" style="font-size:11px;color:#666">Corrige</div></div><div id="comboList"></div></div></div>
-<div class="page" id="pageFilms"><div class="section-title">Mes films</div><div id="filmsList"></div><button class="btn" id="btnAddFilm">+ Ajouter un film</button><div class="section-title" style="margin-top:24px">Films par defaut</div><div id="defaultFilmsList"></div></div>
-<div class="modal" id="modal"><div class="modal-box"><div class="modal-title">Nouvelle pellicule</div><div class="form-group"><label>Appareil</label><select id="inCam"><option>Nikon S2</option><option>Voigtlander Bessa II</option><option>Autre</option></select></div><div class="form-group"><label>Film</label><input type="text" id="inFilm" placeholder="Ex: Portra 400"><div class="presets" id="presets"></div></div><div class="form-row"><div class="form-group"><label>ISO</label><select id="inIso"><option>100</option><option>200</option><option selected>400</option><option>800</option></select></div><div class="form-group"><label>Format</label><select id="inFmt"><option>35mm</option><option>120</option></select></div></div><div class="form-group"><label>Notes</label><textarea id="inNotes" placeholder="Lieu, conditions..."></textarea></div><div class="form-actions"><button class="cancel-btn" id="btnCancel">Annuler</button><button class="save-btn" id="btnSave">Enregistrer</button></div></div></div>
-<div class="modal" id="modalFilm"><div class="modal-box"><div class="modal-title">Ajouter un film</div><div class="form-group"><label>Nom du film</label><input type="text" id="inFilmName" placeholder="Ex: Portra 800"></div><div class="form-row"><div class="form-group"><label>ISO</label><select id="inFilmIso"><option>50</option><option>100</option><option>200</option><option selected>400</option><option>800</option><option>1600</option><option>3200</option></select></div><div class="form-group"><label>Type</label><select id="inFilmType"><option value="color">Couleur</option><option value="bw">Noir et Blanc</option></select></div></div><div class="form-group"><label>Compensation reciprocite (exposant)</label><input type="number" id="inFilmP" value="1.3" step="0.05" min="1" max="2"></div><div class="form-group"><label>Seuil (secondes)</label><input type="number" id="inFilmTh" value="10" step="1" min="1" max="30"></div><p style="font-size:11px;color:#666;margin-top:8px">Exposant: 1.3=leger (Portra), 1.5=fort (Tri-X). Seuil: 1s pour N&B, 10s pour couleur</p><div class="form-actions"><button class="cancel-btn" id="btnCancelFilm">Annuler</button><button class="save-btn" id="btnSaveFilm">Enregistrer</button></div></div></div>
+<div class="tabs">
+<button class="tab active" id="tabRolls">Rolls</button>
+<button class="tab" id="tabFilms">Films</button>
+</div>
+
+<!-- PAGE ROLLS -->
+<div class="page active" id="pageRolls">
+<div id="rollsList"></div>
+<button class="btn" id="btnAddRoll">+ Nouvelle pellicule</button>
+</div>
+
+<!-- PAGE FILMS + POSEMÈTRE -->
+<div class="page" id="pageFilms">
+<!-- Posemètre -->
+<div class="meter" id="meterBox" style="display:none">
+<div class="meter-header">
+<div class="meter-film" id="mFilmName">—</div>
+<div class="meter-iso">
+<div class="iso-box">
+<div class="label">ISO Boîte</div>
+<div class="value" id="mISOBox">—</div>
+</div>
+<div class="iso-arrow">→</div>
+<div class="iso-box iso-effective">
+<div class="label">Mesurer à</div>
+<div class="value" id="mISOEff">—</div>
+</div>
+<div class="compensation" id="mComp">+1</div>
+</div>
+<div class="meter-details">
+<span id="mType">—</span> • Réciprocité P=<span id="mRecip">—</span> • <span id="mLat">—</span>
+</div>
+</div>
+<div class="section-title">Conditions de lumière</div>
+<div class="chips" id="lightChips"></div>
+<div class="results">
+<div class="results-header"><div>Ouverture</div><div>Vitesse</div><div>Réciprocité</div></div>
+<div id="resultsList"></div>
+</div>
+</div>
+
+<div class="section-title">Choisir un film</div>
+<div id="filmsList"></div>
+</div>
+
+<!-- MODAL ROLL -->
+<div class="modal" id="modalRoll">
+<div class="modal-box">
+<div class="modal-title">Nouvelle pellicule</div>
+<div class="form-group"><label>Appareil</label><select id="rCam"><option>Nikon S2</option><option>Voigtländer Bessa II</option><option>Autre</option></select></div>
+<div class="form-group"><label>Film</label><input type="text" id="rFilm" placeholder="Ex: Portra 400"><div class="presets" id="rPresets"></div></div>
+<div class="form-row">
+<div class="form-group"><label>ISO</label><select id="rISO"><option>50</option><option>100</option><option>160</option><option>200</option><option>400</option><option>800</option><option>1600</option><option>3200</option></select></div>
+<div class="form-group"><label>Format</label><select id="rFmt"><option>35mm</option><option>120</option></select></div>
+</div>
+<div class="form-group"><label>Notes</label><textarea id="rNotes" placeholder="Lieu, conditions..."></textarea></div>
+<div class="form-actions"><button class="cancel-btn" id="btnCancelRoll">Annuler</button><button class="save-btn" id="btnSaveRoll">Enregistrer</button></div>
+</div>
+</div>
+
 <script>
-var rolls=JSON.parse(localStorage.getItem("flr")||"[]"),myFilms=JSON.parse(localStorage.getItem("myFilms")||"[]"),currentFilm=localStorage.getItem("currentFilm")||"Portra 400",ev=12,iso=400;
-var scenes=[{e:15,l:"Neige"},{e:14,l:"Plage"},{e:12,l:"Soleil"},{e:10,l:"Nuageux"},{e:8,l:"Ombre"},{e:6,l:"Interieur"},{e:4,l:"Soir"},{e:1,l:"Nuit"}],isos=[100,200,400,800,1600];
-var defaultFilms=[{n:"Portra 400",i:"400",p:1.3,th:10,t:"color"},{n:"Portra 160",i:"160",p:1.3,th:10,t:"color"},{n:"Ektar 100",i:"100",p:1.3,th:10,t:"color"},{n:"Gold 200",i:"200",p:1.3,th:10,t:"color"},{n:"Tri-X 400",i:"400",p:1.5,th:1,t:"bw"},{n:"HP5 Plus",i:"400",p:1.4,th:1,t:"bw"},{n:"T-Max 400",i:"400",p:1.15,th:10,t:"bw"},{n:"Delta 100",i:"100",p:1.25,th:1,t:"bw"},{n:"Cinestill 800T",i:"800",p:1.3,th:4,t:"color"}];
-function getAllFilms(){return myFilms.concat(defaultFilms)}
-function getFilmData(name){var all=getAllFilms();for(var i=0;i<all.length;i++)if(all[i].n===name)return all[i];return{n:name,i:"400",p:1.3,th:10,t:"color"}}
-function reciprocity(t,film){var f=getFilmData(film);if(t<f.th)return t;return Math.pow(t,f.p)}
-function formatTime(t){if(t<1)return"1/"+Math.round(1/t);if(t<60)return Math.round(t)+"s";var m=Math.floor(t/60),s=Math.round(t%60);return m+"m"+s+"s"}
-function showPage(page){document.getElementById("tabRolls").className=page==="rolls"?"tab active":"tab";document.getElementById("tabMeter").className=page==="meter"?"tab active":"tab";document.getElementById("tabFilms").className=page==="films"?"tab active":"tab";document.getElementById("pageRolls").className=page==="rolls"?"page active":"page";document.getElementById("pageMeter").className=page==="meter"?"page active":"page";document.getElementById("pageFilms").className=page==="films"?"page active":"page"}
-document.getElementById("tabRolls").onclick=function(){showPage("rolls")};
-document.getElementById("tabMeter").onclick=function(){showPage("meter")};
-document.getElementById("tabFilms").onclick=function(){showPage("films");renderFilmsList()};
-document.getElementById("btnAdd").onclick=function(){document.getElementById("modal").className="modal open"};
-document.getElementById("btnCancel").onclick=function(){document.getElementById("modal").className="modal"};
-document.getElementById("btnAddFilm").onclick=function(){document.getElementById("modalFilm").className="modal open"};
-document.getElementById("btnCancelFilm").onclick=function(){document.getElementById("modalFilm").className="modal"};
-document.getElementById("btnSave").onclick=function(){var r={id:Date.now(),film:document.getElementById("inFilm").value||"Film",cam:document.getElementById("inCam").value,iso:document.getElementById("inIso").value,fmt:document.getElementById("inFmt").value,notes:document.getElementById("inNotes").value,st:"loaded"};rolls.unshift(r);localStorage.setItem("flr",JSON.stringify(rolls));document.getElementById("modal").className="modal";document.getElementById("inFilm").value="";document.getElementById("inNotes").value="";renderRolls()};
-document.getElementById("btnSaveFilm").onclick=function(){var f={n:document.getElementById("inFilmName").value,i:document.getElementById("inFilmIso").value,p:parseFloat(document.getElementById("inFilmP").value),th:parseInt(document.getElementById("inFilmTh").value),t:document.getElementById("inFilmType").value};if(!f.n){alert("Nom requis");return}myFilms.unshift(f);localStorage.setItem("myFilms",JSON.stringify(myFilms));document.getElementById("modalFilm").className="modal";document.getElementById("inFilmName").value="";renderFilmsList();renderPresets()};
-function renderRolls(){var c=document.getElementById("rollsList");if(rolls.length===0){c.innerHTML='<div class="empty">Aucune pellicule</div>';return}var h="";for(var i=0;i<rolls.length;i++){var r=rolls[i],sl={loaded:"En cours",exposed:"Exposee",lab:"Au labo",done:"Developpee"},ns={loaded:"exposed",exposed:"lab",lab:"done"},nl={loaded:"Exposee",exposed:"Au labo",lab:"Developpee"};h+='<div class="card"><div class="card-title">'+r.film+'<span class="badge">'+sl[r.st]+'</span></div><div class="card-sub">'+r.cam+" - ISO "+r.iso+" - "+r.fmt+"</div>";if(r.notes)h+='<div style="margin-top:8px;font-size:12px;color:#888;font-style:italic">'+r.notes+"</div>";if(ns[r.st])h+='<button class="btn btn-sm" onclick="upSt('+r.id+",'"+ns[r.st]+"')\">"+nl[r.st]+"</button>";h+='<button class="btn btn-sm btn-danger" onclick="delR('+r.id+')">Suppr</button></div>'}c.innerHTML=h}
-window.upSt=function(id,st){for(var i=0;i<rolls.length;i++)if(rolls[i].id===id){rolls[i].st=st;break}localStorage.setItem("flr",JSON.stringify(rolls));renderRolls()};
-window.delR=function(id){if(confirm("Supprimer?")){rolls=rolls.filter(function(r){return r.id!==id});localStorage.setItem("flr",JSON.stringify(rolls));renderRolls()}};
-function renderFilmsList(){var h="";if(myFilms.length===0){h='<div class="empty" style="padding:20px">Aucun film perso</div>';}else{for(var i=0;i<myFilms.length;i++){var f=myFilms[i],sel=f.n===currentFilm;h+='<div class="film-card'+(sel?" selected":"")+'"><div class="film-info"><h3>'+f.n+'</h3><p>ISO '+f.i+' | '+(f.t==="bw"?"N&B":"Couleur")+' | Exp:'+f.p+' | Seuil:'+f.th+'s</p></div><div class="film-actions"><button class="film-btn select'+(sel?" selected":"")+'" onclick="selectFilm(\''+f.n+'\')">'+(sel?"Actif":"Choisir")+'</button><button class="film-btn delete" onclick="delFilm('+i+')">X</button></div></div>';}}document.getElementById("filmsList").innerHTML=h;var h2="";for(var i=0;i<defaultFilms.length;i++){var f=defaultFilms[i],sel=f.n===currentFilm;h2+='<div class="film-card'+(sel?" selected":"")+'"><div class="film-info"><h3>'+f.n+'</h3><p>ISO '+f.i+' | '+(f.t==="bw"?"N&B":"Couleur")+' | Exp:'+f.p+' | Seuil:'+f.th+'s</p></div><div class="film-actions"><button class="film-btn select'+(sel?" selected":"")+'" onclick="selectFilm(\''+f.n+'\')">'+(sel?"Actif":"Choisir")+'</button></div></div>';}document.getElementById("defaultFilmsList").innerHTML=h2}
-window.selectFilm=function(name){currentFilm=name;localStorage.setItem("currentFilm",name);document.getElementById("activeFilmName").textContent=name;renderFilmsList();renderCombos()};
-window.delFilm=function(i){if(confirm("Supprimer ce film?")){myFilms.splice(i,1);localStorage.setItem("myFilms",JSON.stringify(myFilms));renderFilmsList();renderPresets()}};
-function renderScenes(){var h="";for(var i=0;i<scenes.length;i++){var s=scenes[i];h+='<span class="chip'+(s.e===ev?" accent":"")+'" onclick="setEV('+s.e+')">'+s.l+"</span>"}document.getElementById("sceneChips").innerHTML=h}
-function renderIsos(){var h="";for(var i=0;i<isos.length;i++){var v=isos[i];h+='<span class="chip'+(v===iso?" active":"")+'" onclick="setISO('+v+')">'+v+"</span>"}document.getElementById("isoChips").innerHTML=h}
-window.setEV=function(v){ev=v;document.getElementById("evVal").textContent=v;renderScenes();renderCombos()};
-window.setISO=function(v){iso=v;renderIsos();renderCombos()};
-function renderCombos(){var aps=[2,2.8,4,5.6,8,11,16],sps=[{v:.001,l:"1/1000"},{v:.002,l:"1/500"},{v:.004,l:"1/250"},{v:.008,l:"1/125"},{v:.0167,l:"1/60"},{v:.0333,l:"1/30"},{v:.0667,l:"1/15"},{v:.125,l:"1/8"},{v:.25,l:"1/4"},{v:.5,l:"1/2"},{v:1,l:"1s"},{v:2,l:"2s"},{v:4,l:"4s"},{v:8,l:"8s"},{v:15,l:"15s"},{v:30,l:"30s"}],h="",ev100=ev+Math.log(iso/100)/Math.log(2);for(var i=0;i<aps.length;i++){var f=aps[i],t=f*f/Math.pow(2,ev100),cl=sps[0],md=999;for(var j=0;j<sps.length;j++){var d=Math.abs(Math.log(t)-Math.log(sps[j].v));if(d<md){md=d;cl=sps[j]}}if(md<.7){var corrected=reciprocity(cl.v,currentFilm);var corrStr=(corrected>cl.v)?formatTime(corrected):"-";h+='<div class="combo"><div class="combo-cell ap">f/'+f+'</div><div class="combo-cell sp">'+cl.l+'</div><div class="combo-cell corrected">'+corrStr+'</div></div>';}}document.getElementById("comboList").innerHTML=h}
-function renderPresets(){var all=getAllFilms(),h="";for(var i=0;i<all.length;i++){var f=all[i];h+='<span class="preset" onclick="selFilmPreset(\''+f.n+"','"+f.i+"')\">"+f.n+"</span>"}document.getElementById("presets").innerHTML=h}
-window.selFilmPreset=function(n,i){document.getElementById("inFilm").value=n;document.getElementById("inIso").value=i};
-document.getElementById("activeFilmName").textContent=currentFilm;
-renderRolls();renderScenes();renderIsos();renderCombos();renderPresets();
+// =============================================
+// BASE DE DONNÉES FILMS - DONNÉES RÉELLES
+// Compensation = stops de surexposition recommandés
+// =============================================
+// Format: {
+//   n: nom, 
+//   iso: ISO boîte,
+//   ei: ISO effectif recommandé,
+//   comp: compensation en stops (+ = surexposer),
+//   lat: [sous-exp tolérée, sur-exp tolérée] en stops,
+//   p: facteur réciprocité (formule Tc = Tm^p),
+//   th: seuil réciprocité (secondes),
+//   t: type (color/bw/slide),
+//   tip: conseil rapide,
+//   b: marque
+// }
+
+var films = [
+// === KODAK COLOR ===
+{n:"Portra 160",iso:160,ei:100,comp:"+2/3",lat:[-1,3],p:1.0,th:10,t:"color",tip:"Surexposer 2/3 stop pour couleurs riches, quasi aucune réciprocité",b:"Kodak"},
+{n:"Portra 400",iso:400,ei:200,comp:"+1",lat:[-1,3],p:1.0,th:10,t:"color",tip:"LE film à surexposer ! +1 stop pour le look Portra crémeux",b:"Kodak"},
+{n:"Portra 800",iso:800,ei:400,comp:"+1",lat:[-1,2],p:1.0,th:10,t:"color",tip:"Surexposer +1, idéal basse lumière et tungstène",b:"Kodak"},
+{n:"Ektar 100",iso:100,ei:100,comp:"0",lat:[-1,2],p:1.15,th:1,t:"color",tip:"Box speed ! Très précis, peu tolérant à la sous-ex",b:"Kodak"},
+{n:"Gold 200",iso:200,ei:100,comp:"+1",lat:[-1,3],p:1.33,th:1,t:"color",tip:"Surexposer +1 pour tons chauds et dorés",b:"Kodak"},
+{n:"Ultramax 400",iso:400,ei:200,comp:"+1",lat:[-1,3],p:1.33,th:1,t:"color",tip:"Surexposer +1, bon rapport qualité/prix",b:"Kodak"},
+{n:"ColorPlus 200",iso:200,ei:100,comp:"+1",lat:[-1,3],p:1.33,th:1,t:"color",tip:"Surexposer +1, économique et fiable",b:"Kodak"},
+
+// === KODAK B&W ===
+{n:"Tri-X 400",iso:400,ei:320,comp:"+1/3",lat:[-2,2],p:1.54,th:1,t:"bw",tip:"Légère surex +1/3. ATTENTION réciprocité forte !",b:"Kodak"},
+{n:"T-Max 100",iso:100,ei:100,comp:"0",lat:[-1,2],p:1.15,th:10,t:"bw",tip:"Box speed, grain ultra-fin, très précis",b:"Kodak"},
+{n:"T-Max 400",iso:400,ei:400,comp:"0",lat:[-1,2],p:1.24,th:10,t:"bw",tip:"Box speed, moderne et net, réciprocité faible",b:"Kodak"},
+{n:"T-Max P3200",iso:3200,ei:1600,comp:"+1",lat:[-1,1],p:1.15,th:10,t:"bw",tip:"Vrai ISO ~800-1000, surex +1, très pushable",b:"Kodak"},
+
+// === ILFORD ===
+{n:"HP5 Plus 400",iso:400,ei:320,comp:"+1/3",lat:[-2,2],p:1.31,th:1,t:"bw",tip:"Surexposer +1/3, très tolérant, classique",b:"Ilford"},
+{n:"FP4 Plus 125",iso:125,ei:100,comp:"+1/3",lat:[-1,2],p:1.26,th:1,t:"bw",tip:"Surexposer +1/3, grain fin, excellent contraste",b:"Ilford"},
+{n:"Delta 100",iso:100,ei:100,comp:"0",lat:[-1,1],p:1.26,th:1,t:"bw",tip:"Box speed, T-grain ultra-fin, très précis",b:"Ilford"},
+{n:"Delta 400",iso:400,ei:320,comp:"+1/3",lat:[-1,2],p:1.41,th:1,t:"bw",tip:"Surexposer +1/3, moderne, réciprocité moyenne",b:"Ilford"},
+{n:"Delta 3200",iso:3200,ei:1600,comp:"+1",lat:[-1,2],p:1.33,th:1,t:"bw",tip:"Vrai ISO ~1000 ! Surexposer +1, pushable à 6400",b:"Ilford"},
+{n:"Pan F Plus 50",iso:50,ei:50,comp:"0",lat:[-1,1],p:1.33,th:1,t:"bw",tip:"Box speed, grain le plus fin, précision requise",b:"Ilford"},
+{n:"XP2 Super 400",iso:400,ei:200,comp:"+1",lat:[-1,3],p:1.31,th:1,t:"bw",tip:"Surexposer +1, process C-41, très tolérant",b:"Ilford"},
+{n:"SFX 200",iso:200,ei:200,comp:"0",lat:[-1,1],p:1.43,th:1,t:"bw",tip:"Box speed, effet infrarouge avec filtre rouge",b:"Ilford"},
+{n:"Ortho Plus 80",iso:80,ei:80,comp:"0",lat:[-1,1],p:1.25,th:1,t:"bw",tip:"Box speed, orthochromatique, pas de rouge",b:"Ilford"},
+
+// === HARMAN/KENTMERE ===
+{n:"Kentmere 100",iso:100,ei:100,comp:"0",lat:[-1,2],p:1.26,th:1,t:"bw",tip:"Box speed, économique, bon grain",b:"Harman"},
+{n:"Kentmere 400",iso:400,ei:320,comp:"+1/3",lat:[-1,2],p:1.30,th:1,t:"bw",tip:"Surexposer +1/3, économique et fiable",b:"Harman"},
+{n:"Phoenix 200",iso:200,ei:100,comp:"+1",lat:[-1,2],p:1.33,th:1,t:"color",tip:"Surexposer +1, look unique et vintage",b:"Harman"},
+
+// === FUJIFILM ===
+{n:"Velvia 50",iso:50,ei:50,comp:"0",lat:[-0.5,0.5],p:1.40,th:4,t:"slide",tip:"DIAPO ! Box speed, exposition CRITIQUE ±0.5 stop",b:"Fujifilm"},
+{n:"Velvia 100",iso:100,ei:100,comp:"0",lat:[-0.5,0.5],p:1.40,th:4,t:"slide",tip:"DIAPO ! Box speed, exposition CRITIQUE ±0.5 stop",b:"Fujifilm"},
+{n:"Provia 100F",iso:100,ei:100,comp:"0",lat:[-0.5,0.5],p:1.33,th:1,t:"slide",tip:"DIAPO ! Box speed, couleurs naturelles, précis",b:"Fujifilm"},
+{n:"Acros II 100",iso:100,ei:100,comp:"0",lat:[-1,2],p:1.0,th:120,t:"bw",tip:"Box speed, AUCUNE réciprocité jusqu'à 2 minutes !",b:"Fujifilm"},
+{n:"Superia 400",iso:400,ei:200,comp:"+1",lat:[-1,2],p:1.33,th:1,t:"color",tip:"Surexposer +1, tons verts caractéristiques",b:"Fujifilm"},
+{n:"C200",iso:200,ei:100,comp:"+1",lat:[-1,2],p:1.33,th:1,t:"color",tip:"Surexposer +1, économique, tons frais",b:"Fujifilm"},
+
+// === CINESTILL ===
+{n:"800T",iso:800,ei:500,comp:"+2/3",lat:[-1,2],p:1.30,th:1,t:"color",tip:"Surexposer +2/3, tungstène, halation caractéristique",b:"CineStill"},
+{n:"400D",iso:400,ei:200,comp:"+1",lat:[-1,2],p:1.30,th:1,t:"color",tip:"Surexposer +1, daylight, halation douce",b:"CineStill"},
+{n:"50D",iso:50,ei:50,comp:"0",lat:[-1,2],p:1.30,th:1,t:"color",tip:"Box speed, ultra-fin, daylight",b:"CineStill"},
+
+// === FOMAPAN ===
+{n:"Fomapan 100",iso:100,ei:80,comp:"+1/3",lat:[-1,2],p:1.35,th:1,t:"bw",tip:"Surexposer +1/3, look vintage, économique",b:"Fomapan"},
+{n:"Fomapan 200",iso:200,ei:160,comp:"+1/3",lat:[-1,2],p:1.35,th:1,t:"bw",tip:"Surexposer +1/3, polyvalent",b:"Fomapan"},
+{n:"Fomapan 400",iso:400,ei:320,comp:"+1/3",lat:[-1,2],p:1.35,th:1,t:"bw",tip:"Surexposer +1/3, grain prononcé, caractère",b:"Fomapan"},
+
+// === ROLLEI ===
+{n:"RPX 100",iso:100,ei:80,comp:"+1/3",lat:[-1,2],p:1.35,th:1,t:"bw",tip:"Surexposer +1/3, fin et contrasté",b:"Rollei"},
+{n:"RPX 400",iso:400,ei:320,comp:"+1/3",lat:[-1,2],p:1.35,th:1,t:"bw",tip:"Surexposer +1/3, polyvalent",b:"Rollei"},
+{n:"Infrared 400",iso:400,ei:400,comp:"0",lat:[-1,1],p:1.40,th:1,t:"bw",tip:"Box speed avec filtre R72, effet IR",b:"Rollei"}
+];
+
+// Conditions lumineuses (EV à ISO 100)
+var lights = [
+{ev:16,name:"Neige/Sable",desc:"Réflexion intense"},
+{ev:15,name:"Plein soleil",desc:"Ombres nettes"},
+{ev:14,name:"Soleil voilé",desc:"Ombres douces"},
+{ev:13,name:"Nuageux clair",desc:"Pas d'ombres"},
+{ev:12,name:"Nuageux",desc:"Couvert uniforme"},
+{ev:11,name:"Couvert sombre",desc:"Ciel gris"},
+{ev:10,name:"Ombre",desc:"Ombre en extérieur"},
+{ev:8,name:"Intérieur clair",desc:"Grande fenêtre"},
+{ev:6,name:"Intérieur",desc:"Éclairage normal"},
+{ev:4,name:"Intérieur sombre",desc:"Peu de lumière"},
+{ev:2,name:"Crépuscule",desc:"Juste après coucher"},
+{ev:0,name:"Nuit urbaine",desc:"Éclairage public"},
+{ev:-2,name:"Nuit noire",desc:"Lune, étoiles"}
+];
+
+// Ouvertures disponibles
+var apertures = [1.4, 2, 2.8, 4, 5.6, 8, 11, 16, 22];
+
+// Vitesses de référence
+var speeds = [
+{v:1/8000,l:"1/8000"},{v:1/4000,l:"1/4000"},{v:1/2000,l:"1/2000"},{v:1/1000,l:"1/1000"},
+{v:1/500,l:"1/500"},{v:1/250,l:"1/250"},{v:1/125,l:"1/125"},{v:1/60,l:"1/60"},
+{v:1/30,l:"1/30"},{v:1/15,l:"1/15"},{v:1/8,l:"1/8"},{v:1/4,l:"1/4"},
+{v:1/2,l:"1/2"},{v:1,l:"1s"},{v:2,l:"2s"},{v:4,l:"4s"},{v:8,l:"8s"},
+{v:15,l:"15s"},{v:30,l:"30s"},{v:60,l:"1min"},{v:120,l:"2min"},{v:300,l:"5min"}
+];
+
+// État
+var rolls = JSON.parse(localStorage.getItem("flr") || "[]");
+var currentFilm = null;
+var currentEV = 12;
+
+// Fonctions utilitaires
+function getFilm(name) {
+  return films.find(f => f.n === name) || null;
+}
+
+function calcReciprocity(t, film) {
+  if (!film || t < film.th) return t;
+  if (film.p === 1.0) return t;
+  return Math.pow(t, film.p);
+}
+
+function formatTime(t) {
+  if (t < 1) return "1/" + Math.round(1/t);
+  if (t < 60) return Math.round(t) + "s";
+  var m = Math.floor(t/60), s = Math.round(t%60);
+  if (m >= 60) { var h = Math.floor(m/60); m = m%60; return h+"h"+(m>0?m+"m":""); }
+  return m + "min" + (s>0 ? s+"s" : "");
+}
+
+function findNearestSpeed(t) {
+  var best = speeds[0], minDiff = Infinity;
+  for (var i=0; i<speeds.length; i++) {
+    var diff = Math.abs(Math.log(t) - Math.log(speeds[i].v));
+    if (diff < minDiff) { minDiff = diff; best = speeds[i]; }
+  }
+  return minDiff < 0.5 ? best : null;
+}
+
+// Navigation
+function showPage(p) {
+  document.getElementById("tabRolls").className = p==="rolls" ? "tab active" : "tab";
+  document.getElementById("tabFilms").className = p==="films" ? "tab active" : "tab";
+  document.getElementById("pageRolls").className = p==="rolls" ? "page active" : "page";
+  document.getElementById("pageFilms").className = p==="films" ? "page active" : "page";
+}
+
+document.getElementById("tabRolls").onclick = () => showPage("rolls");
+document.getElementById("tabFilms").onclick = () => { showPage("films"); renderFilms(); };
+
+// ========== ROLLS ==========
+document.getElementById("btnAddRoll").onclick = () => document.getElementById("modalRoll").className = "modal open";
+document.getElementById("btnCancelRoll").onclick = () => document.getElementById("modalRoll").className = "modal";
+document.getElementById("btnSaveRoll").onclick = function() {
+  var r = {
+    id: Date.now(),
+    film: document.getElementById("rFilm").value || "Film",
+    cam: document.getElementById("rCam").value,
+    iso: document.getElementById("rISO").value,
+    fmt: document.getElementById("rFmt").value,
+    notes: document.getElementById("rNotes").value,
+    st: "loaded"
+  };
+  rolls.unshift(r);
+  localStorage.setItem("flr", JSON.stringify(rolls));
+  document.getElementById("modalRoll").className = "modal";
+  document.getElementById("rFilm").value = "";
+  document.getElementById("rNotes").value = "";
+  renderRolls();
+};
+
+function renderRolls() {
+  var c = document.getElementById("rollsList");
+  if (rolls.length === 0) { c.innerHTML = '<div class="empty">Aucune pellicule chargée</div>'; return; }
+  var h = "";
+  var states = {loaded:"En cours",exposed:"Exposée",lab:"Au labo",done:"Développée"};
+  var nextSt = {loaded:"exposed",exposed:"lab",lab:"done"};
+  var nextLbl = {loaded:"Exposée",exposed:"Au labo",lab:"Développée"};
+  rolls.forEach(r => {
+    h += `<div class="card">
+      <div class="card-title">${r.film}<span class="badge">${states[r.st]}</span></div>
+      <div class="card-sub">${r.cam} · ISO ${r.iso} · ${r.fmt}</div>
+      ${r.notes ? '<div style="margin-top:8px;font-size:12px;color:#666;font-style:italic">'+r.notes+'</div>' : ''}
+      ${nextSt[r.st] ? '<button class="btn btn-sm" onclick="advanceRoll('+r.id+')">→ '+nextLbl[r.st]+'</button>' : ''}
+      <button class="btn btn-sm btn-danger" onclick="deleteRoll(${r.id})">Suppr</button>
+    </div>`;
+  });
+  c.innerHTML = h;
+}
+
+window.advanceRoll = function(id) {
+  var r = rolls.find(x => x.id === id);
+  if (r) {
+    if (r.st === "loaded") r.st = "exposed";
+    else if (r.st === "exposed") r.st = "lab";
+    else if (r.st === "lab") r.st = "done";
+    localStorage.setItem("flr", JSON.stringify(rolls));
+    renderRolls();
+  }
+};
+
+window.deleteRoll = function(id) {
+  if (confirm("Supprimer cette pellicule ?")) {
+    rolls = rolls.filter(x => x.id !== id);
+    localStorage.setItem("flr", JSON.stringify(rolls));
+    renderRolls();
+  }
+};
+
+// ========== FILMS ==========
+function renderFilms() {
+  var brands = ["Kodak","Ilford","Harman","Fujifilm","CineStill","Fomapan","Rollei"];
+  var h = "";
+  brands.forEach(brand => {
+    var bf = films.filter(f => f.b === brand);
+    if (bf.length === 0) return;
+    h += `<div class="brand-header">${brand}</div>`;
+    bf.forEach(f => {
+      var sel = currentFilm && currentFilm.n === f.n;
+      var typeLbl = f.t==="bw" ? "N&B" : (f.t==="slide" ? "Diapo" : "Couleur");
+      var compClass = f.comp === "0" ? "zero" : "";
+      var latStr = "Lat: " + f.lat[0] + "/" + f.lat[1];
+      var pStr = f.p === 1.0 ? "aucune" : "P=" + f.p;
+      
+      h += `<div class="film-card${sel?' selected':''}">
+        <div class="film-header">
+          <div class="film-info">
+            <h3>${f.n}</h3>
+            <p>ISO ${f.iso} → mesurer à ${f.ei}</p>
+          </div>
+          <div class="film-compensation ${compClass}">${f.comp === "0" ? "0" : f.comp}</div>
+        </div>
+        <div class="film-meta">
+          <span>${typeLbl}</span>
+          <span>${latStr} stops</span>
+          <span>Récip: ${pStr}</span>
+        </div>
+        <div class="film-tip">${f.tip}</div>
+        <button class="film-btn${sel?' active':''}" onclick="selectFilm('${f.n}')">${sel?'✓ Actif':'Choisir'}</button>
+      </div>`;
+    });
+  });
+  document.getElementById("filmsList").innerHTML = h;
+}
+
+window.selectFilm = function(name) {
+  currentFilm = getFilm(name);
+  if (!currentFilm) return;
+  
+  // Mettre à jour le posemètre
+  document.getElementById("meterBox").style.display = "block";
+  document.getElementById("mFilmName").textContent = currentFilm.n;
+  document.getElementById("mISOBox").textContent = currentFilm.iso;
+  document.getElementById("mISOEff").textContent = currentFilm.ei;
+  
+  var compEl = document.getElementById("mComp");
+  compEl.textContent = currentFilm.comp === "0" ? "0" : currentFilm.comp;
+  compEl.className = currentFilm.comp === "0" ? "compensation zero" : "compensation";
+  
+  document.getElementById("mType").textContent = currentFilm.t==="bw"?"N&B":(currentFilm.t==="slide"?"Diapo":"Couleur");
+  document.getElementById("mRecip").textContent = currentFilm.p === 1.0 ? "aucune" : currentFilm.p;
+  document.getElementById("mLat").textContent = "Latitude " + currentFilm.lat[0] + "/" + currentFilm.lat[1] + " stops";
+  
+  renderLights();
+  renderResults();
+  renderFilms();
+  
+  // Scroll vers le haut
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+
+function renderLights() {
+  var h = "";
+  lights.forEach(l => {
+    h += `<span class="chip${l.ev===currentEV?' active':''}" onclick="setLight(${l.ev})">${l.name}</span>`;
+  });
+  document.getElementById("lightChips").innerHTML = h;
+}
+
+window.setLight = function(ev) {
+  currentEV = ev;
+  renderLights();
+  renderResults();
+};
+
+function renderResults() {
+  if (!currentFilm) {
+    document.getElementById("resultsList").innerHTML = '<div class="empty">Sélectionnez un film</div>';
+    return;
+  }
+  
+  // Utiliser l'ISO effectif (ei) pour le calcul
+  var iso = currentFilm.ei;
+  var evAtISO = currentEV + Math.log2(iso / 100);
+  
+  var h = "";
+  apertures.forEach(ap => {
+    // Calcul: t = N² / 2^EV
+    var t = (ap * ap) / Math.pow(2, evAtISO);
+    var sp = findNearestSpeed(t);
+    
+    if (sp) {
+      var corrected = calcReciprocity(sp.v, currentFilm);
+      var needsCorr = corrected > sp.v * 1.1;
+      var corrStr = needsCorr ? formatTime(corrected) : "—";
+      var corrClass = needsCorr ? "" : " none";
+      
+      h += `<div class="result-row">
+        <div class="result-cell aperture">f/${ap}</div>
+        <div class="result-cell speed">${sp.l}</div>
+        <div class="result-cell corrected${corrClass}">${corrStr}</div>
+      </div>`;
+    }
+  });
+  
+  if (!h) h = '<div class="empty">Aucune combinaison valide</div>';
+  document.getElementById("resultsList").innerHTML = h;
+}
+
+// Presets pour modal
+function renderPresets() {
+  var h = "";
+  films.slice(0,8).forEach(f => {
+    h += `<span class="preset" onclick="setPreset('${f.n}',${f.iso})">${f.n}</span>`;
+  });
+  document.getElementById("rPresets").innerHTML = h;
+}
+
+window.setPreset = function(name, iso) {
+  document.getElementById("rFilm").value = name;
+  var sel = document.getElementById("rISO");
+  for (var i=0; i<sel.options.length; i++) {
+    if (parseInt(sel.options[i].value) === iso) { sel.selectedIndex = i; break; }
+  }
+};
+
+// Init
+renderRolls();
+renderPresets();
 </script>
 </body>
 </html>
