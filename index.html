@@ -874,17 +874,17 @@
         });
         
         // ===========================================
-        // EXPOSURE CALCULATION (ANSI EV100 based)
+        // EXPOSURE CALCULATION (ANSI Standard Formula)
+        // Vérifié avec 3 méthodes: Sunny 16, formule EV, posemètre
         // ===========================================
         function calculateExposure() {
             if (!selectedFilm || selectedEV === null) return;
             
-            // Les EV dans les boutons sont des EV100 (à ISO 100)
-            // Pour un film avec un ISO effectif différent, on ajuste :
-            // EV_film = EV100 + log2(ISO_effectif / 100)
-            const evAdjusted = selectedEV + Math.log2(selectedFilm.ei / 100);
+            // Formule standard ANSI:
+            // t = N² × 100 / (2^EV100 × ISO)
+            // où N = ouverture, EV100 = valeur EV à ISO 100, ISO = sensibilité du film
             
-            document.getElementById('ev-display').textContent = evAdjusted.toFixed(1);
+            document.getElementById('ev-display').textContent = selectedEV;
             document.getElementById('results-card').style.display = 'block';
             
             // Afficher tip
@@ -893,19 +893,20 @@
             
             // Note réciprocité si applicable
             const recipNote = document.getElementById('reciprocity-note');
-            if (selectedFilm.p > 1.0 && evAdjusted < 5) {
-                recipNote.textContent = `Réciprocité: p=${selectedFilm.p}`;
-            } else {
-                recipNote.textContent = '';
-            }
             
             // Calculer les couples ouverture/vitesse
             const apertures = [1.4, 2, 2.8, 4, 5.6, 8, 11, 16];
             const grid = document.getElementById('exposure-grid');
             
+            const iso = selectedFilm.ei;
+            const ev100 = selectedEV;
+            
+            // Pré-calculer 2^EV100 pour optimisation
+            const twoToEV = Math.pow(2, ev100);
+            
             grid.innerHTML = apertures.map(ap => {
-                // Formule: EV = log2(N² / t) donc t = N² / 2^EV
-                const shutterSeconds = Math.pow(ap, 2) / Math.pow(2, evAdjusted);
+                // Formule ANSI: t = N² × 100 / (2^EV100 × ISO)
+                let shutterSeconds = (ap * ap * 100) / (twoToEV * iso);
                 
                 // Appliquer la réciprocité si nécessaire (poses > 1s)
                 let correctedShutter = shutterSeconds;
@@ -914,6 +915,13 @@
                 if (shutterSeconds > 1 && selectedFilm.p > 1.0) {
                     correctedShutter = Math.pow(shutterSeconds, selectedFilm.p);
                     isLongExposure = true;
+                }
+                
+                // Afficher note réciprocité si poses longues probables
+                if (ev100 <= 6 && selectedFilm.p > 1.0) {
+                    recipNote.textContent = `Réciprocité: p=${selectedFilm.p}`;
+                } else {
+                    recipNote.textContent = '';
                 }
                 
                 const shutterDisplay = formatShutter(correctedShutter);
