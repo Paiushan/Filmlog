@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>FilmLog</title>
-    <link rel="manifest" href="manifest.json">
+    <title>FilmLog 2.0</title>
     <style>
         * {
             margin: 0;
@@ -28,6 +27,8 @@
             --border: #2a2a2a;
             --success: #4ade80;
             --warning: #fbbf24;
+            --danger: #ef4444;
+            --info: #3b82f6;
         }
         
         body {
@@ -48,42 +49,79 @@
         
         /* Header */
         .header {
-            padding: 60px 20px 20px;
-            text-align: center;
+            padding: 50px 20px 16px;
             background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
         }
         
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 4px;
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
         }
         
-        .header p {
+        .header-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid var(--border);
+            flex-shrink: 0;
+        }
+        
+        .header-text {
+            text-align: left;
+        }
+        
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 2px;
+        }
+        
+        .header h1 span {
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 500;
+            vertical-align: super;
+        }
+        
+        .header .byline {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-bottom: 2px;
+        }
+        
+        .header .tagline {
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 12px;
         }
         
         /* Tabs */
         .tabs {
             display: flex;
-            padding: 0 20px;
-            gap: 8px;
-            margin-bottom: 20px;
+            padding: 0 16px;
+            gap: 6px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
+        .tabs::-webkit-scrollbar { display: none; }
+        
         .tab {
-            flex: 1;
-            padding: 14px;
+            flex: 0 0 auto;
+            padding: 12px 16px;
             border: none;
             background: var(--bg-tertiary);
             color: var(--text-secondary);
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s;
+            white-space: nowrap;
         }
         
         .tab.active {
@@ -94,7 +132,7 @@
         /* Content */
         .content {
             flex: 1;
-            padding: 0 20px 100px;
+            padding: 0 16px 100px;
         }
         
         .tab-content {
@@ -105,22 +143,65 @@
             display: block;
         }
         
-        /* Film Database Tab */
+        /* Search Bar */
+        .search-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .search-input {
+            flex: 1;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-size: 15px;
+        }
+        
+        .search-input::placeholder {
+            color: var(--text-tertiary);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .compare-btn {
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .compare-btn.active {
+            background: var(--info);
+            border-color: var(--info);
+            color: white;
+        }
+        
+        /* Film Categories */
         .film-categories {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 20px;
+            gap: 6px;
+            margin-bottom: 16px;
         }
         
         .category-btn {
-            padding: 10px 16px;
+            padding: 8px 14px;
             border: 1px solid var(--border);
             background: var(--bg-secondary);
             color: var(--text-secondary);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
-            border-radius: 20px;
+            border-radius: 16px;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -131,18 +212,20 @@
             color: var(--accent);
         }
         
+        /* Film Grid */
         .film-grid {
             display: grid;
-            gap: 12px;
+            gap: 10px;
         }
         
         .film-card {
             background: var(--bg-card);
-            border-radius: 16px;
-            padding: 16px;
+            border-radius: 14px;
+            padding: 14px;
             cursor: pointer;
             transition: all 0.2s;
             border: 2px solid transparent;
+            position: relative;
         }
         
         .film-card:hover, .film-card.selected {
@@ -150,20 +233,50 @@
             background: var(--bg-tertiary);
         }
         
+        .film-card.compare-selected {
+            border-color: var(--info);
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .film-card .compare-checkbox {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--bg-primary);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .compare-mode .film-card .compare-checkbox {
+            display: flex;
+        }
+        
+        .film-card.compare-selected .compare-checkbox {
+            background: var(--info);
+            border-color: var(--info);
+            color: white;
+        }
+        
         .film-card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         
         .film-name {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 600;
         }
         
         .film-brand {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
             margin-top: 2px;
         }
@@ -172,34 +285,34 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 4px;
+            gap: 3px;
         }
         
         .iso-box {
             background: var(--bg-primary);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 13px;
             font-weight: 700;
             font-family: 'SF Mono', monospace;
         }
         
         .iso-effective {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--accent);
             font-weight: 600;
         }
         
         .film-tags {
             display: flex;
-            gap: 6px;
+            gap: 5px;
             flex-wrap: wrap;
         }
         
         .film-tag {
-            font-size: 11px;
-            padding: 4px 8px;
-            border-radius: 6px;
+            font-size: 10px;
+            padding: 3px 7px;
+            border-radius: 5px;
             background: var(--bg-primary);
             color: var(--text-secondary);
         }
@@ -210,9 +323,145 @@
             font-weight: 600;
         }
         
+        /* Compare Panel */
+        .compare-panel {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 16px;
+            z-index: 100;
+        }
+        
+        .compare-panel.visible {
+            display: block;
+        }
+        
+        .compare-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .compare-panel-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .compare-panel-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .compare-panel-actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .btn-compare-view {
+            background: var(--info);
+            color: white;
+        }
+        
+        .btn-compare-clear {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+        
+        /* Compare Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 200;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal-overlay.visible {
+            display: block;
+        }
+        
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .modal-header h3 {
+            font-size: 18px;
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 16px;
+        }
+        
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .compare-table th,
+        .compare-table td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+        
+        .compare-table th {
+            color: var(--text-secondary);
+            font-weight: 500;
+            background: var(--bg-secondary);
+            position: sticky;
+            top: 0;
+        }
+        
+        .compare-table th:first-child {
+            width: 100px;
+        }
+        
+        .compare-table td:first-child {
+            color: var(--text-secondary);
+            font-size: 11px;
+        }
+        
         /* Meter Section */
         .meter-section {
-            margin-top: 24px;
+            margin-top: 20px;
             display: none;
         }
         
@@ -221,81 +470,179 @@
         }
         
         .section-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         
         .selected-film-banner {
             background: linear-gradient(135deg, var(--accent-dim) 0%, var(--bg-card) 100%);
             border: 1px solid var(--accent);
             border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
+            padding: 14px;
+            margin-bottom: 16px;
         }
         
         .selected-film-name {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
             margin-bottom: 4px;
         }
         
         .selected-film-info {
             display: flex;
-            gap: 16px;
-            font-size: 13px;
+            gap: 14px;
+            font-size: 12px;
             color: var(--text-secondary);
         }
         
-        .selected-film-info span {
+        /* Camera Meter */
+        .camera-meter-section {
+            margin-bottom: 16px;
+        }
+        
+        .camera-meter-toggle {
             display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .meter-mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .meter-mode-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        
+        .camera-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        
+        .camera-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 12px;
+            pointer-events: none;
+        }
+        
+        .camera-ev-display {
+            align-self: flex-end;
+            background: rgba(0,0,0,0.7);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-family: 'SF Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .camera-ev-display span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .spot-meter-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 50%;
+        }
+        
+        .camera-placeholder {
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 4px;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            gap: 12px;
         }
         
-        .selected-film-info .accent {
-            color: var(--accent);
+        .camera-placeholder button {
+            padding: 12px 24px;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
             font-weight: 600;
+            cursor: pointer;
         }
         
-        .light-conditions {
+        /* Light buttons (manual mode) */
+        .light-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
         
         .light-btn {
-            padding: 14px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 8px;
             border: 1px solid var(--border);
-            background: var(--bg-card);
-            color: var(--text-primary);
-            font-size: 11px;
-            font-weight: 500;
-            border-radius: 12px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s;
-            text-align: center;
         }
         
-        .light-btn .icon {
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-        
-        .light-btn .ev-label {
-            font-size: 9px;
-            color: var(--text-tertiary);
-            margin-top: 2px;
+        .light-btn:hover {
+            border-color: var(--accent);
         }
         
         .light-btn.active {
             background: var(--accent);
             border-color: var(--accent);
             color: white;
+        }
+        
+        .light-btn .icon {
+            font-size: 20px;
+        }
+        
+        .light-btn .ev-label {
+            font-size: 10px;
+            color: var(--text-tertiary);
         }
         
         .light-btn.active .ev-label {
@@ -305,57 +652,47 @@
         /* Results */
         .results-card {
             background: var(--bg-card);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 14px;
         }
         
         .results-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border);
+            margin-bottom: 12px;
         }
         
         .results-ev {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-        
-        .results-ev span {
-            color: var(--accent);
+            font-size: 24px;
             font-weight: 700;
-            font-size: 18px;
+            font-family: 'SF Mono', monospace;
         }
         
         .exposure-grid {
             display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 8px;
         }
         
         .exposure-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background: var(--bg-tertiary);
-            border-radius: 10px;
+            padding: 10px 12px;
+            background: var(--bg-primary);
+            border-radius: 8px;
         }
         
         .aperture {
-            font-size: 16px;
             font-weight: 600;
-            color: var(--text-primary);
-            font-family: 'SF Mono', monospace;
+            font-size: 14px;
         }
         
         .shutter {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--accent);
             font-family: 'SF Mono', monospace;
+            color: var(--text-secondary);
+            font-size: 14px;
         }
         
         .shutter.long-exposure {
@@ -367,26 +704,53 @@
             background: var(--bg-secondary);
             border-left: 3px solid var(--accent);
             border-radius: 8px;
-            padding: 14px;
-            margin-top: 16px;
+            padding: 12px;
+            margin-top: 14px;
         }
         
         .tip-card p {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
             line-height: 1.5;
+        }
+        
+        .tip-card .tip-exposure {
+            margin-bottom: 8px;
+        }
+        
+        .tip-card .tip-visual {
+            background: rgba(255, 107, 53, 0.1);
+            border-radius: 6px;
+            padding: 10px;
+            margin: 8px 0;
+            font-size: 12px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+        
+        .tip-card .tip-gallery a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 8px 12px;
+            background: rgba(255, 107, 53, 0.15);
+            border-radius: 6px;
+            margin-top: 8px;
         }
         
         /* Rolls Tab */
         .add-roll-btn {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             border: 2px dashed var(--border);
             background: transparent;
-            color: var(--text-secondary);
-            font-size: 15px;
-            font-weight: 500;
             border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 14px;
             cursor: pointer;
             margin-bottom: 16px;
             transition: all 0.2s;
@@ -404,234 +768,337 @@
         
         .roll-card {
             background: var(--bg-card);
-            border-radius: 16px;
-            padding: 16px;
+            border-radius: 14px;
+            overflow: hidden;
         }
         
         .roll-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
+            align-items: center;
+            padding: 14px;
+            cursor: pointer;
         }
         
-        .roll-film-name {
-            font-size: 16px;
+        .roll-info h3 {
+            font-size: 15px;
             font-weight: 600;
+            margin-bottom: 3px;
         }
         
-        .roll-camera {
-            font-size: 13px;
+        .roll-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 11px;
             color: var(--text-secondary);
         }
         
         .roll-status {
             padding: 4px 10px;
-            border-radius: 20px;
+            border-radius: 12px;
             font-size: 11px;
             font-weight: 600;
         }
         
-        .roll-status.loaded {
-            background: rgba(74, 222, 128, 0.15);
-            color: var(--success);
+        .roll-status.shooting {
+            background: var(--success);
+            color: black;
         }
         
         .roll-status.finished {
-            background: rgba(251, 191, 36, 0.15);
-            color: var(--warning);
+            background: var(--warning);
+            color: black;
         }
         
         .roll-status.developed {
-            background: var(--accent-dim);
-            color: var(--accent);
+            background: var(--info);
+            color: white;
         }
         
-        .roll-meta {
-            display: flex;
-            gap: 16px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-        
-        .roll-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-            padding-top: 12px;
+        /* Roll Frames */
+        .roll-frames {
+            display: none;
+            padding: 0 14px 14px;
             border-top: 1px solid var(--border);
         }
         
-        .roll-action-btn {
+        .roll-frames.expanded {
+            display: block;
+        }
+        
+        .frames-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+        
+        .frames-count {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .add-frame-btn {
+            padding: 6px 12px;
+            background: var(--accent);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .frames-list {
+            display: grid;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .frame-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+        
+        .frame-number {
+            width: 28px;
+            height: 28px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'SF Mono', monospace;
+        }
+        
+        .frame-details {
+            flex: 1;
+        }
+        
+        .frame-exposure {
+            font-size: 13px;
+            font-weight: 500;
+            font-family: 'SF Mono', monospace;
+        }
+        
+        .frame-notes {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        
+        .frame-delete {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        /* Roll Actions */
+        .roll-actions {
+            display: flex;
+            gap: 8px;
+            padding: 0 14px 14px;
+        }
+        
+        .roll-actions button {
             flex: 1;
             padding: 10px;
             border: 1px solid var(--border);
-            background: transparent;
+            background: var(--bg-secondary);
+            border-radius: 8px;
             color: var(--text-secondary);
             font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .roll-actions button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        .roll-actions .btn-danger:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        
+        /* Export buttons */
+        .export-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        .export-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: 13px;
             font-weight: 500;
-            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
         }
         
-        .roll-action-btn:hover {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-        }
-        
-        .roll-action-btn.primary {
-            background: var(--accent);
+        .export-btn:hover {
             border-color: var(--accent);
-            color: white;
+            color: var(--accent);
         }
         
-        /* Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 100;
-            align-items: flex-end;
-            justify-content: center;
-        }
-        
-        .modal-overlay.active {
-            display: flex;
-        }
-        
-        .modal {
-            background: var(--bg-secondary);
-            border-radius: 20px 20px 0 0;
-            width: 100%;
-            max-width: 430px;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 24px;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-        
-        .modal-title {
-            font-size: 20px;
-            font-weight: 700;
-        }
-        
-        .modal-close {
-            width: 32px;
-            height: 32px;
-            border: none;
-            background: var(--bg-tertiary);
-            color: var(--text-secondary);
-            font-size: 20px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-        
-        .form-input, .form-select {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid var(--border);
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            font-size: 15px;
-            border-radius: 10px;
-        }
-        
-        .form-select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-        }
-        
-        .form-btn {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            background: var(--accent);
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 12px;
-            cursor: pointer;
-        }
-        
-        /* Empty state */
+        /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 40px 20px;
             color: var(--text-tertiary);
         }
         
         .empty-state .icon {
             font-size: 48px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
         
-        .empty-state p {
+        /* Modals */
+        .frame-modal .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .form-group label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
             font-size: 14px;
         }
         
-        /* Source info */
-        .source-info {
-            margin-top: 20px;
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .modal-actions button {
+            flex: 1;
             padding: 12px;
-            background: var(--bg-tertiary);
+            border: none;
             border-radius: 8px;
-            font-size: 11px;
-            color: var(--text-tertiary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+        
+        /* Source Info */
+        .source-info {
             text-align: center;
+            font-size: 10px;
+            color: var(--text-tertiary);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .toast.visible {
+            opacity: 1;
+        }
+        
+        /* No results */
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-tertiary);
         }
     </style>
 </head>
 <body>
     <div class="app-container">
         <header class="header">
-            <h1>🎞️ FilmLog <span style="font-size: 14px; font-weight: 400; font-style: italic; color: var(--text-secondary);">by Stéphane Plovier</span></h1>
-            <p>Carnet du photographe argentique</p>
+            <div class="header-content">
+                <img class="header-image" src="data:image/jpeg;base64,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" alt="Nikon S2">
+                <div class="header-text">
+                    <h1>FilmLog <span>2.0</span></h1>
+                    <p class="byline"><em>by Stéphane Plovier</em></p>
+                    <p class="tagline">Posemètre • Base de films • Suivi</p>
+                </div>
+            </div>
         </header>
         
         <div class="tabs">
-            <button class="tab active" data-tab="rolls">Rolls</button>
-            <button class="tab" data-tab="films">Films</button>
+            <button class="tab active" data-tab="films">📷 Films</button>
+            <button class="tab" data-tab="rolls">🎞️ Rouleaux</button>
         </div>
         
         <main class="content">
-            <!-- Rolls Tab -->
-            <div class="tab-content active" id="rolls-tab">
-                <button class="add-roll-btn" onclick="openModal()">+ Nouvelle pellicule</button>
-                <div class="rolls-list" id="rolls-list">
-                    <div class="empty-state">
-                        <div class="icon">📷</div>
-                        <p>Aucune pellicule enregistrée<br>Ajoute ta première bobine !</p>
-                    </div>
+            <!-- Films Tab -->
+            <div id="films-tab" class="tab-content active">
+                <div class="search-bar">
+                    <input type="text" class="search-input" id="film-search" placeholder="🔍 Rechercher un film...">
+                    <button class="compare-btn" id="compare-toggle">⚖️ Comparer</button>
                 </div>
-            </div>
-            
-            <!-- Films Database Tab -->
-            <div class="tab-content" id="films-tab">
+                
                 <div class="film-categories">
                     <button class="category-btn active" data-category="all">Tous</button>
                     <button class="category-btn" data-category="color-neg">Couleur</button>
@@ -644,140 +1111,388 @@
                 <div class="meter-section" id="meter-section">
                     <div class="section-title">Posemètre</div>
                     
-                    <div class="selected-film-banner" id="selected-film-banner">
+                    <div class="selected-film-banner">
                         <div class="selected-film-name" id="selected-film-name">-</div>
                         <div class="selected-film-info">
-                            <span>ISO effectif: <span class="accent" id="selected-ei">-</span></span>
-                            <span>Compensation: <span class="accent" id="selected-comp">-</span></span>
+                            <span>EI <strong id="selected-ei">-</strong></span>
+                            <span>Compensation: <strong id="selected-comp">-</strong></span>
                         </div>
                     </div>
                     
-                    <div class="section-title">Conditions de lumière (EV @ ISO 100)</div>
-                    <div class="light-conditions">
-                        <button class="light-btn" data-ev="16"><div class="icon">🏖️</div>Neige/Sable<div class="ev-label">EV 16</div></button>
-                        <button class="light-btn" data-ev="15"><div class="icon">☀️</div>Plein soleil<div class="ev-label">EV 15</div></button>
-                        <button class="light-btn" data-ev="14"><div class="icon">🌤️</div>Soleil voilé<div class="ev-label">EV 14</div></button>
-                        <button class="light-btn" data-ev="13"><div class="icon">⛅</div>Nuageux clair<div class="ev-label">EV 13</div></button>
-                        <button class="light-btn" data-ev="12"><div class="icon">☁️</div>Couvert<div class="ev-label">EV 12</div></button>
-                        <button class="light-btn" data-ev="12" data-variant="shade"><div class="icon">🌳</div>Ombre ouverte<div class="ev-label">EV 12</div></button>
-                        <button class="light-btn" data-ev="7"><div class="icon">🏛️</div>Intérieur clair<div class="ev-label">EV 7</div></button>
-                        <button class="light-btn" data-ev="6"><div class="icon">🏠</div>Intérieur<div class="ev-label">EV 5-7</div></button>
-                        <button class="light-btn" data-ev="4"><div class="icon">🌙</div>Sombre<div class="ev-label">EV 4-5</div></button>
+                    <div class="camera-meter-section">
+                        <div class="camera-meter-toggle">
+                            <button class="meter-mode-btn" data-mode="manual">📋 Manuel</button>
+                            <button class="meter-mode-btn active" data-mode="camera">📸 Caméra</button>
+                        </div>
+                        
+                        <div id="camera-meter" class="camera-container">
+                            <div class="camera-placeholder" id="camera-placeholder">
+                                <span style="font-size: 40px;">📸</span>
+                                <p>Mesure via caméra</p>
+                                <button onclick="startCamera()">Activer la caméra</button>
+                            </div>
+                            <video id="camera-video" autoplay playsinline style="display:none;"></video>
+                            <div class="camera-overlay" id="camera-overlay" style="display:none;">
+                                <div class="camera-ev-display">EV <span id="camera-ev">--</span></div>
+                                <div class="spot-meter-circle"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="manual-meter" style="display: none;">
+                        <div class="section-title">Conditions de lumière</div>
+                        <div class="light-grid">
+                            <button class="light-btn" data-ev="15"><div class="icon">☀️</div>Plein soleil<div class="ev-label">EV 15</div></button>
+                            <button class="light-btn" data-ev="14"><div class="icon">🌤️</div>Soleil voilé<div class="ev-label">EV 14</div></button>
+                            <button class="light-btn" data-ev="13"><div class="icon">⛅</div>Nuageux clair<div class="ev-label">EV 13</div></button>
+                            <button class="light-btn" data-ev="12"><div class="icon">☁️</div>Couvert<div class="ev-label">EV 12</div></button>
+                            <button class="light-btn" data-ev="10"><div class="icon">🌥️</div>Ombre<div class="ev-label">EV 10</div></button>
+                            <button class="light-btn" data-ev="8"><div class="icon">🌆</div>Golden hour<div class="ev-label">EV 8</div></button>
+                            <button class="light-btn" data-ev="6"><div class="icon">🏠</div>Intérieur<div class="ev-label">EV 6</div></button>
+                            <button class="light-btn" data-ev="4"><div class="icon">🌙</div>Sombre<div class="ev-label">EV 4</div></button>
+                            <button class="light-btn" data-ev="2"><div class="icon">🌃</div>Nuit ville<div class="ev-label">EV 2</div></button>
+                        </div>
                     </div>
                     
                     <div class="results-card" id="results-card" style="display: none;">
                         <div class="results-header">
                             <div class="results-ev">EV <span id="ev-display">-</span></div>
-                            <div style="font-size: 12px; color: var(--text-tertiary);" id="reciprocity-note"></div>
+                            <div style="font-size: 11px; color: var(--text-tertiary);" id="reciprocity-note"></div>
                         </div>
                         <div class="exposure-grid" id="exposure-grid"></div>
                     </div>
                     
                     <div class="tip-card" id="tip-card" style="display: none;">
-                        <p id="tip-text"></p>
+                        <p class="tip-exposure" id="tip-text"></p>
+                        <div class="tip-visual" id="tip-visual"></div>
+                        <div class="tip-gallery" id="tip-gallery"></div>
                     </div>
                     
                     <div class="source-info">
-                        Valeurs EV basées sur ANSI PH2.7-1986 / ISO 2720
+                        Formule ANSI PH2.7-1986 • Réciprocité Schwarzschild<br>
+                        <em>by Stéphane Plovier</em>
                     </div>
                 </div>
             </div>
+            
+            <!-- Rolls Tab -->
+            <div id="rolls-tab" class="tab-content">
+                <button class="add-roll-btn" onclick="showAddRollModal()">
+                    + Ajouter un rouleau
+                </button>
+                
+                <div class="rolls-list" id="rolls-list"></div>
+                
+                <div class="export-buttons">
+                    <button class="export-btn" onclick="exportJSON()">📄 Export JSON</button>
+                    <button class="export-btn" onclick="exportPDF()">📑 Export PDF</button>
+                </div>
+            </div>
         </main>
-    </div>
-    
-    <!-- Add Roll Modal -->
-    <div class="modal-overlay" id="modal-overlay">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">Nouvelle pellicule</h2>
-                <button class="modal-close" onclick="closeModal()">×</button>
+        
+        <!-- Compare Panel -->
+        <div class="compare-panel" id="compare-panel">
+            <div class="compare-panel-header">
+                <span class="compare-panel-title"><span id="compare-count">0</span> films sélectionnés</span>
+                <div class="compare-panel-actions">
+                    <button class="btn-compare-clear" onclick="clearCompare()">Effacer</button>
+                    <button class="btn-compare-view" onclick="showCompareModal()">Comparer</button>
+                </div>
             </div>
-            
-            <div class="form-group">
-                <label class="form-label">Pellicule</label>
-                <select class="form-select" id="roll-film"></select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Appareil</label>
-                <input type="text" class="form-input" id="roll-camera" placeholder="Ex: Nikon S2, Bessa II...">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Date de chargement</label>
-                <input type="date" class="form-input" id="roll-date">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Notes (optionnel)</label>
-                <input type="text" class="form-input" id="roll-notes" placeholder="Lieu, projet, etc.">
-            </div>
-            
-            <button class="form-btn" onclick="saveRoll()">Ajouter la pellicule</button>
         </div>
+        
+        <!-- Compare Modal -->
+        <div class="modal-overlay" id="compare-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Comparaison de films</h3>
+                    <button class="modal-close" onclick="closeCompareModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div style="overflow-x: auto;">
+                        <table class="compare-table" id="compare-table"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add Roll Modal -->
+        <div class="modal-overlay" id="roll-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="roll-modal-title">Nouveau rouleau</h3>
+                    <button class="modal-close" onclick="closeRollModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Film</label>
+                        <select id="roll-film"></select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Format</label>
+                            <select id="roll-format">
+                                <option value="35mm">35mm (36 poses)</option>
+                                <option value="35mm-24">35mm (24 poses)</option>
+                                <option value="120">120</option>
+                                <option value="4x5">4x5</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Appareil</label>
+                            <input type="text" id="roll-camera" placeholder="Ex: Nikon S2">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="roll-notes" placeholder="Notes sur ce rouleau..."></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-secondary" onclick="closeRollModal()">Annuler</button>
+                        <button class="btn-primary" onclick="saveRoll()">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add Frame Modal -->
+        <div class="modal-overlay" id="frame-modal">
+            <div class="modal-content frame-modal">
+                <div class="modal-header">
+                    <h3>Ajouter une pose</h3>
+                    <button class="modal-close" onclick="closeFrameModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="frame-roll-id">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ouverture</label>
+                            <select id="frame-aperture">
+                                <option value="1.4">f/1.4</option>
+                                <option value="2">f/2</option>
+                                <option value="2.8">f/2.8</option>
+                                <option value="4">f/4</option>
+                                <option value="5.6" selected>f/5.6</option>
+                                <option value="8">f/8</option>
+                                <option value="11">f/11</option>
+                                <option value="16">f/16</option>
+                                <option value="22">f/22</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Vitesse</label>
+                            <select id="frame-shutter">
+                                <option value="1/1000">1/1000</option>
+                                <option value="1/500">1/500</option>
+                                <option value="1/250">1/250</option>
+                                <option value="1/125" selected>1/125</option>
+                                <option value="1/60">1/60</option>
+                                <option value="1/30">1/30</option>
+                                <option value="1/15">1/15</option>
+                                <option value="1/8">1/8</option>
+                                <option value="1/4">1/4</option>
+                                <option value="1/2">1/2</option>
+                                <option value="1s">1s</option>
+                                <option value="2s">2s</option>
+                                <option value="4s">4s</option>
+                                <option value="B">B (Bulb)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="frame-notes" placeholder="Sujet, conditions, etc."></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-secondary" onclick="closeFrameModal()">Annuler</button>
+                        <button class="btn-primary" onclick="saveFrame()">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Toast -->
+        <div class="toast" id="toast"></div>
     </div>
-    
+
     <script>
         // ===========================================
-        // FILM DATABASE avec données corrigées
+        // FILM DATABASE (40+ films with full data)
         // ===========================================
         const films = [
             // KODAK COLOR
-            { id: 'portra160', name: 'Portra 160', brand: 'Kodak', iso: 160, ei: 100, category: 'color-neg', compensation: '+2/3', p: 1.0, tip: 'Surexposer de 2/3 stop. Magnifique pour les portraits, tons chair exceptionnels. Aucune correction de réciprocité nécessaire.' },
-            { id: 'portra400', name: 'Portra 400', brand: 'Kodak', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.0, tip: 'Surexposer d\'1 stop. Le film pro le plus polyvalent. Latitude énorme, parfait pour la lumière naturelle variable.' },
-            { id: 'portra800', name: 'Portra 800', brand: 'Kodak', iso: 800, ei: 400, category: 'color-neg', compensation: '+1', p: 1.0, tip: 'Surexposer d\'1 stop. Idéal pour l\'intérieur et la basse lumière. Grain fin pour un 800 ISO.' },
-            { id: 'ektar100', name: 'Ektar 100', brand: 'Kodak', iso: 100, ei: 100, category: 'color-neg', compensation: '0', p: 1.15, tip: 'Exposer à l\'ISO boîte. Grain ultra-fin, couleurs saturées. Parfait pour le paysage. Légère réciprocité.' },
-            { id: 'gold200', name: 'Gold 200', brand: 'Kodak', iso: 200, ei: 100, category: 'color-neg', compensation: '+1', p: 1.33, tip: 'Surexposer d\'1 stop. Tons chauds vintage, excellent rapport qualité/prix. Réciprocité moyenne.' },
-            { id: 'ultramax400', name: 'Ultramax 400', brand: 'Kodak', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.33, tip: 'Surexposer d\'1 stop. Polyvalent et abordable, bon pour débuter. Réciprocité moyenne.' },
-            { id: 'colorplus200', name: 'ColorPlus 200', brand: 'Kodak', iso: 200, ei: 100, category: 'color-neg', compensation: '+1', p: 1.33, tip: 'Surexposer d\'1 stop. Budget friendly, rendu nostalgique.' },
+            { id: 'portra160', name: 'Portra 160', brand: 'Kodak', iso: 160, ei: 100, category: 'color-neg', compensation: '+2/3', p: 1.0, 
+              tip: '📷 Surexposer de 2/3 stop (EI 100). Tons chair exceptionnels, le plus fin grain de la gamme Portra. Latitude +2 stops. Réciprocité: aucune correction jusqu\'à 1s.',
+              visual: '🎨 Pastels doux, peaux crémeuses, lumière douce de studio. Idéal mariages, mode, beauté.',
+              gallery: 'https://thedarkroom.com/film/portra-160/' },
+            { id: 'portra400', name: 'Portra 400', brand: 'Kodak', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.0, 
+              tip: '📷 Surexposer d\'1 stop (EI 200-320). LE film pro par excellence. Latitude énorme (+3/-1 stops). Réciprocité: aucune jusqu\'à 1s.',
+              visual: '🎨 Tons chauds dorés, peaux naturelles et flatteuses, ombres douces. Le roi du portrait lifestyle.',
+              gallery: 'https://thedarkroom.com/film/portra-400/' },
+            { id: 'portra800', name: 'Portra 800', brand: 'Kodak', iso: 800, ei: 400, category: 'color-neg', compensation: '+1', p: 1.0, 
+              tip: '📷 Surexposer d\'1 stop (EI 400-500). Grain remarquablement fin pour un 800. Latitude excellente.',
+              visual: '🎨 Ambiances intérieures chaleureuses, lumière de bougie, fêtes et événements. Tons chair préservés même en basse lumière.',
+              gallery: 'https://thedarkroom.com/film/portra-800/' },
+            { id: 'ektar100', name: 'Ektar 100', brand: 'Kodak', iso: 100, ei: 100, category: 'color-neg', compensation: '0', p: 1.15, 
+              tip: '📷 Exposer à l\'ISO boîte (EI 100). ⚠️ Moins tolérant que Portra! Grain le plus fin au monde. Éviter portraits (accentue rouges/oranges).',
+              visual: '🎨 Couleurs EXPLOSIVES: ciels bleu profond, verts intenses, rouges vibrants. Paysages, architecture, nature morte.',
+              gallery: 'https://thedarkroom.com/film/ektar-100/' },
+            { id: 'gold200', name: 'Gold 200', brand: 'Kodak', iso: 200, ei: 100, category: 'color-neg', compensation: '+1', p: 1.33, 
+              tip: '📷 Surexposer d\'1 stop (EI 100). Excellent rapport qualité/prix. Réciprocité moyenne.',
+              visual: '🎨 Rendu nostalgique années 90, tons chauds ambrés, lumière d\'été. Parfait vacances et vie quotidienne.',
+              gallery: 'https://thedarkroom.com/film/gold-200/' },
+            { id: 'ultramax400', name: 'Ultramax 400', brand: 'Kodak', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.33, 
+              tip: '📷 Surexposer d\'1 stop (EI 200). Film grand public polyvalent. Bon pour débuter.',
+              visual: '🎨 Look "film" authentique, grain visible mais charmant, couleurs punchy. Street, voyage, snapshots.',
+              gallery: 'https://thedarkroom.com/film/ultramax-400/' },
+            { id: 'colorplus200', name: 'ColorPlus 200', brand: 'Kodak', iso: 200, ei: 100, category: 'color-neg', compensation: '+1', p: 1.33, 
+              tip: '📷 Surexposer d\'1 stop (EI 100). Le plus économique de Kodak.',
+              visual: '🎨 Similaire au Gold, tons chauds vintage, rendu nostalgique accessible.',
+              gallery: 'https://www.flickr.com/groups/colorplus200/pool/' },
             
             // KODAK B&W
-            { id: 'trix400', name: 'Tri-X 400', brand: 'Kodak', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.54, tip: 'Surexposer de 1/3 stop. LE film N&B légendaire. Attention: réciprocité forte! 1min mesurée → ~9min corrigée.' },
-            { id: 'tmax100', name: 'T-Max 100', brand: 'Kodak', iso: 100, ei: 100, category: 'bw', compensation: '0', p: 1.15, tip: 'Exposer à l\'ISO boîte. Grain tabulaire ultra-fin, excellent piqué. Faible réciprocité.' },
-            { id: 'tmax400', name: 'T-Max 400', brand: 'Kodak', iso: 400, ei: 400, category: 'bw', compensation: '0', p: 1.24, tip: 'Exposer à l\'ISO boîte. Grain fin pour un 400. Réciprocité modérée.' },
-            { id: 'doublex', name: 'Double-X 5222', brand: 'Kodak', iso: 250, ei: 200, category: 'bw', compensation: '+1/3', p: 1.40, tip: 'Film cinéma, rendu classique Hollywood. Réciprocité notable.' },
+            { id: 'trix400', name: 'Tri-X 400', brand: 'Kodak', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.54, 
+              tip: '📷 Surexposer de 1/3 stop (EI 320). LE film N&B légendaire depuis 1954! Push excellent jusqu\'à 3200. ⚠️ Réciprocité forte: 1min → ~9min.',
+              visual: '🎨 Contraste dramatique, noirs profonds, grain "crunchy" iconique. LE look photojournalisme, street, documentaire.',
+              gallery: 'https://thedarkroom.com/film/tri-x-400/' },
+            { id: 'tmax100', name: 'T-Max 100', brand: 'Kodak', iso: 100, ei: 100, category: 'bw', compensation: '0', p: 1.15, 
+              tip: '📷 Exposer à l\'ISO boîte (EI 100). Grain tabulaire le plus fin des N&B Kodak. Préférer T-Max Developer.',
+              visual: '🎨 Piqué extrême, transitions tonales soyeuses, quasi sans grain. Paysage, architecture, nu artistique.',
+              gallery: 'https://thedarkroom.com/film/t-max-100/' },
+            { id: 'tmax400', name: 'T-Max 400', brand: 'Kodak', iso: 400, ei: 400, category: 'bw', compensation: '0', p: 1.24, 
+              tip: '📷 Exposer à l\'ISO boîte (EI 400). Grain tabulaire fin et moderne. Excellent pour scan numérique.',
+              visual: '🎨 Version moderne et "propre" du Tri-X: contraste maîtrisé, grain fin, tons subtils.',
+              gallery: 'https://thedarkroom.com/film/t-max-400/' },
+            { id: 'doublex', name: 'Double-X 5222', brand: 'Kodak', iso: 250, ei: 200, category: 'bw', compensation: '+1/3', p: 1.40, 
+              tip: '📷 Surexposer de 1/3 stop (EI 200). Film cinéma 35mm, rendu classique Hollywood noir.',
+              visual: '🎨 Look film noir années 40-50, contraste moyen-haut, grain cinématique. Portraits dramatiques, urbain nocturne.',
+              gallery: 'https://www.flickr.com/groups/double-x/pool/' },
             
             // ILFORD
-            { id: 'hp5', name: 'HP5 Plus 400', brand: 'Ilford', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.31, tip: 'Surexposer de 1/3 stop. Polyvalent et tolérant, énorme latitude d\'exposition.' },
-            { id: 'fp4', name: 'FP4 Plus 125', brand: 'Ilford', iso: 125, ei: 100, category: 'bw', compensation: '+1/3', p: 1.26, tip: 'Surexposer de 1/3 stop. Grain très fin, excellent pour le portrait et le paysage.' },
-            { id: 'delta100', name: 'Delta 100', brand: 'Ilford', iso: 100, ei: 100, category: 'bw', compensation: '0', p: 1.26, tip: 'Exposer à l\'ISO boîte. Grain tabulaire ultra-fin, très haut piqué.' },
-            { id: 'delta400', name: 'Delta 400', brand: 'Ilford', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.41, tip: 'Surexposer de 1/3 stop. Grain fin et moderne.' },
-            { id: 'delta3200', name: 'Delta 3200', brand: 'Ilford', iso: 3200, ei: 1600, category: 'bw', compensation: '+1', p: 1.33, tip: 'ISO réel ~1000. Surexposer d\'1 stop minimum. Pour la basse lumière extrême.' },
-            { id: 'panf50', name: 'Pan F Plus 50', brand: 'Ilford', iso: 50, ei: 50, category: 'bw', compensation: '0', p: 1.33, tip: 'Le grain le plus fin d\'Ilford. Pour les agrandissements géants.' },
-            { id: 'xp2', name: 'XP2 Super 400', brand: 'Ilford', iso: 400, ei: 200, category: 'bw', compensation: '+1', p: 1.31, tip: 'Surexposer d\'1 stop. N&B chromogène, développement C-41. Très grande latitude.' },
-            { id: 'sfx200', name: 'SFX 200', brand: 'Ilford', iso: 200, ei: 200, category: 'bw', compensation: '0', p: 1.30, tip: 'Sensibilité infrarouge étendue. Avec filtre rouge pour effet IR.' },
+            { id: 'hp5', name: 'HP5 Plus 400', brand: 'Ilford', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.31, 
+              tip: '📷 Surexposer de 1/3 stop (EI 200-320). Latitude énorme (+2/-1 stops). Push excellent 800-3200.',
+              visual: '🎨 Polyvalent et tolérant, grain cubique classique, tons moyens riches. Street, reportage, portraits.',
+              gallery: 'https://thedarkroom.com/film/hp5-plus/' },
+            { id: 'fp4', name: 'FP4 Plus 125', brand: 'Ilford', iso: 125, ei: 100, category: 'bw', compensation: '+1/3', p: 1.26, 
+              tip: '📷 Surexposer de 1/3 stop (EI 100). Grain très fin, tonalités douces. Développer en Perceptol pour grain minimal.',
+              visual: '🎨 Douceur et finesse, transitions tonales subtiles, rendu classique anglais. Paysage, portrait, architecture.',
+              gallery: 'https://thedarkroom.com/film/fp4-plus/' },
+            { id: 'delta100', name: 'Delta 100', brand: 'Ilford', iso: 100, ei: 100, category: 'bw', compensation: '0', p: 1.26, 
+              tip: '📷 Exposer à l\'ISO boîte (EI 100). Grain tabulaire ultra-fin, piqué exceptionnel.',
+              visual: '🎨 Netteté extrême, grain quasi invisible, tons modernes et neutres. Grands tirages, détails architecturaux.',
+              gallery: 'https://thedarkroom.com/film/delta-100/' },
+            { id: 'delta400', name: 'Delta 400', brand: 'Ilford', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.41, 
+              tip: '📷 Surexposer de 1/3 stop (EI 320). Grain tabulaire fin et moderne. Push bon jusqu\'à 1600.',
+              visual: '🎨 Alternative moderne au HP5: plus fin, plus "propre", contraste maîtrisé.',
+              gallery: 'https://thedarkroom.com/film/delta-400/' },
+            { id: 'delta3200', name: 'Delta 3200', brand: 'Ilford', iso: 3200, ei: 1600, category: 'bw', compensation: '+1', p: 1.33, 
+              tip: '📷 ISO réel ~1000-1250. Surexposer d\'1 stop minimum (EI 1600). Push possible 6400-12800.',
+              visual: '🎨 Grain expressif et atmosphérique, ambiances nocturnes, concerts, clubs. Noir et blanc "rock\'n\'roll".',
+              gallery: 'https://thedarkroom.com/film/delta-3200/' },
+            { id: 'panf50', name: 'Pan F Plus 50', brand: 'Ilford', iso: 50, ei: 50, category: 'bw', compensation: '0', p: 1.33, 
+              tip: '📷 Exposer à l\'ISO boîte (EI 50). Le grain le plus fin d\'Ilford! Nécessite lumière abondante.',
+              visual: '🎨 Le plus fin d\'Ilford: détails extrêmes, tirages géants possibles. Nature morte, macro, paysage lumineux.',
+              gallery: 'https://www.flickr.com/groups/panf/pool/' },
+            { id: 'xp2', name: 'XP2 Super 400', brand: 'Ilford', iso: 400, ei: 200, category: 'bw', compensation: '+1', p: 1.31, 
+              tip: '📷 Surexposer d\'1 stop (EI 200). N&B chromogène C-41! Latitude exceptionnelle (EI 50-800 même rouleau).',
+              visual: '🎨 N&B doux et fin, presque sans grain en 120. Développable en labo photo standard!',
+              gallery: 'https://thedarkroom.com/film/xp2/' },
+            { id: 'sfx200', name: 'SFX 200', brand: 'Ilford', iso: 200, ei: 200, category: 'bw', compensation: '0', p: 1.30, 
+              tip: '📷 Sensibilité infrarouge étendue (jusqu\'à 740nm). Avec filtre R72 pour effet Wood.',
+              visual: '🎨 Avec filtre IR: ciels NOIRS dramatiques, feuillages BLANCS surréalistes, effet onirique unique.',
+              gallery: 'https://www.flickr.com/groups/ilfordsfx/pool/' },
             
             // FUJIFILM
-            { id: 'velvia50', name: 'Velvia 50', brand: 'Fujifilm', iso: 50, ei: 50, category: 'slide', compensation: '0', p: 1.40, tip: '⚠️ DIAPO: Latitude ±0.5 stop seulement! Couleurs ultra-saturées, idéal paysage. Réciprocité notable.' },
-            { id: 'velvia100', name: 'Velvia 100', brand: 'Fujifilm', iso: 100, ei: 100, category: 'slide', compensation: '0', p: 1.40, tip: '⚠️ DIAPO: Latitude ±0.5 stop seulement! Saturation extrême pour paysages vibrants.' },
-            { id: 'provia100f', name: 'Provia 100F', brand: 'Fujifilm', iso: 100, ei: 100, category: 'slide', compensation: '0', p: 1.33, tip: '⚠️ DIAPO: Exposition critique! Couleurs naturelles, polyvalent.' },
-            { id: 'acros100ii', name: 'Acros II 100', brand: 'Fujifilm', iso: 100, ei: 100, category: 'bw', compensation: '0', p: 1.0, tip: 'EXCEPTIONNEL: Aucune réciprocité jusqu\'à 2 minutes! Parfait pour les poses longues.' },
-            { id: 'superia400', name: 'Superia X-TRA 400', brand: 'Fujifilm', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.33, tip: 'Surexposer d\'1 stop. Tons verts caractéristiques Fuji. Polyvalent.' },
-            { id: 'c200', name: 'C200', brand: 'Fujifilm', iso: 200, ei: 100, category: 'color-neg', compensation: '+1', p: 1.33, tip: 'Surexposer d\'1 stop. Film budget avec rendu agréable.' },
+            { id: 'velvia50', name: 'Velvia 50', brand: 'Fujifilm', iso: 50, ei: 50, category: 'slide', compensation: '0', p: 1.40, 
+              tip: '⚠️ DIAPO: Latitude ±0.5 stop SEULEMENT! Réciprocité forte: 4s→5s, 8s→12s, 30s→1min. Éviter portraits.',
+              visual: '🎨 Couleurs les PLUS SATURÉES au monde! Verts émeraude, rouges rubis, ciels profonds. LE film paysage.',
+              gallery: 'https://thedarkroom.com/film/velvia-50/' },
+            { id: 'velvia100', name: 'Velvia 100', brand: 'Fujifilm', iso: 100, ei: 100, category: 'slide', compensation: '0', p: 1.40, 
+              tip: '⚠️ DIAPO: Latitude ±0.5 stop! Réciprocité EXCELLENTE: aucune correction jusqu\'à 1 minute!',
+              visual: '🎨 Saturation extrême comme Velvia 50, meilleure pour poses longues. Couchers de soleil, nature.',
+              gallery: 'https://www.flickr.com/groups/velvia100/pool/' },
+            { id: 'provia100f', name: 'Provia 100F', brand: 'Fujifilm', iso: 100, ei: 100, category: 'slide', compensation: '0', p: 1.33, 
+              tip: '⚠️ DIAPO: Exposition critique! Couleurs naturelles et neutres, meilleur pour portraits.',
+              visual: '🎨 Diapo polyvalente: couleurs fidèles mais vivantes, tons chair acceptables. Voyage, reportage, portraits.',
+              gallery: 'https://thedarkroom.com/film/provia-100f/' },
+            { id: 'acros100ii', name: 'Acros II 100', brand: 'Fujifilm', iso: 100, ei: 100, category: 'bw', compensation: '0', p: 1.0, 
+              tip: '📷 EXCEPTIONNEL: Aucune réciprocité jusqu\'à 2 MINUTES! Le roi de la pose longue N&B.',
+              visual: '🎨 Noirs veloutés profonds, grain ultra-fin, transitions douces. Architecture nocturne, paysage longue pose.',
+              gallery: 'https://thedarkroom.com/film/acros-ii/' },
+            { id: 'superia400', name: 'Superia X-TRA 400', brand: 'Fujifilm', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.33, 
+              tip: '📷 Surexposer d\'1 stop (EI 200). Tons verts/cyans caractéristiques Fuji.',
+              visual: '🎨 Signature Fuji: verts lumineux, cyans frais, ambiance "film japonais". Voyage, street.',
+              gallery: 'https://www.flickr.com/groups/fuji_superia/pool/' },
+            { id: 'c200', name: 'C200', brand: 'Fujifilm', iso: 200, ei: 100, category: 'color-neg', compensation: '+1', p: 1.33, 
+              tip: '📷 Surexposer d\'1 stop (EI 100). Film budget au rendu agréable.',
+              visual: '🎨 Tons légèrement froids, verts Fuji subtils, grain fin pour le prix.',
+              gallery: 'https://www.flickr.com/groups/fujic200/pool/' },
             
             // CINESTILL
-            { id: 'cinestill800t', name: '800T', brand: 'CineStill', iso: 800, ei: 500, category: 'color-neg', compensation: '+2/3', p: 1.30, tip: 'Surexposer de 2/3 stop. Film tungstène, halos caractéristiques. Magique de nuit.' },
-            { id: 'cinestill400d', name: '400D', brand: 'CineStill', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.30, tip: 'Surexposer d\'1 stop. Version lumière du jour du film cinéma.' },
-            { id: 'cinestill50d', name: '50D', brand: 'CineStill', iso: 50, ei: 50, category: 'color-neg', compensation: '0', p: 1.30, tip: 'Film cinéma grain ultra-fin. Pour la lumière du jour.' },
+            { id: 'cinestill800t', name: '800T', brand: 'CineStill', iso: 800, ei: 500, category: 'color-neg', compensation: '+2/3', p: 1.30, 
+              tip: '📷 Surexposer de 2/3 stop (EI 500-640). Basé sur Kodak Vision3 500T. En plein jour: filtre 85B.',
+              visual: '🎨 HALOS ROUGES iconiques autour des lumières! Néons, scènes urbaines nocturnes, look cinéma. Magique de nuit.',
+              gallery: 'https://thedarkroom.com/film/800t/' },
+            { id: 'cinestill400d', name: '400D', brand: 'CineStill', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.30, 
+              tip: '📷 Surexposer d\'1 stop (EI 200). Version lumière du jour. Latitude ~10 stops.',
+              visual: '🎨 Halos subtils, couleurs cinéma fidèles et naturelles. Portraits, street, extérieur lumineux.',
+              gallery: 'https://thedarkroom.com/film/400d/' },
+            { id: 'cinestill50d', name: '50D', brand: 'CineStill', iso: 50, ei: 50, category: 'color-neg', compensation: '0', p: 1.30, 
+              tip: '📷 Exposer à l\'ISO boîte (EI 50). Latitude 10+ stops. Pour lumière du jour abondante.',
+              visual: '🎨 Grain ultra-fin cinéma, couleurs naturelles et précises, halos doux. Paysage, portrait extérieur.',
+              gallery: 'https://thedarkroom.com/film/50d/' },
             
             // FOMAPAN
-            { id: 'fomapan100', name: 'Fomapan 100', brand: 'Foma', iso: 100, ei: 80, category: 'bw', compensation: '+1/3', p: 1.40, tip: 'Film tchèque économique. Rendu classique, grain prononcé.' },
-            { id: 'fomapan200', name: 'Fomapan 200', brand: 'Foma', iso: 200, ei: 160, category: 'bw', compensation: '+1/3', p: 1.40, tip: 'Bon compromis vitesse/grain. Prix attractif.' },
-            { id: 'fomapan400', name: 'Fomapan 400', brand: 'Foma', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.40, tip: 'Le plus rapide des Fomapan. Grain caractéristique.' },
+            { id: 'fomapan100', name: 'Fomapan 100', brand: 'Foma', iso: 100, ei: 80, category: 'bw', compensation: '+1/3', p: 1.40, 
+              tip: '📷 Surexposer de 1/3 stop (EI 80). Film tchèque économique. Grande latitude (+1/-2 stops).',
+              visual: '🎨 Look "old school" authentique, grain classique prononcé, contraste modéré. Budget-friendly!',
+              gallery: 'https://www.flickr.com/groups/fomapan/pool/' },
+            { id: 'fomapan200', name: 'Fomapan 200', brand: 'Foma', iso: 200, ei: 160, category: 'bw', compensation: '+1/3', p: 1.40, 
+              tip: '📷 Surexposer de 1/3-1 stop (EI 125-160). Ombres peuvent décrocher vite. Réciprocité forte.',
+              visual: '🎨 Compromis vitesse/grain, look mi-classique mi-moderne. Ombres profondes dramatiques.',
+              gallery: 'https://www.flickr.com/groups/fomapan/pool/' },
+            { id: 'fomapan400', name: 'Fomapan 400', brand: 'Foma', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.40, 
+              tip: '📷 Surexposer de 1/3-1 stop (EI 200-320). ⚠️ ISO réel ~200-320! Push possible 800-1600.',
+              visual: '🎨 Grain caractéristique "old Tri-X" des années 80. Look street/documentaire vintage authentique.',
+              gallery: 'https://www.flickr.com/groups/fomapan400/pool/' },
             
             // ROLLEI
-            { id: 'rpx100', name: 'RPX 100', brand: 'Rollei', iso: 100, ei: 100, category: 'bw', compensation: '0', p: 1.26, tip: 'Grain fin, bonne latitude. Alternative aux grands noms.' },
-            { id: 'rpx400', name: 'RPX 400', brand: 'Rollei', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.31, tip: 'Polyvalent, grain contrôlé.' },
-            { id: 'infrared400', name: 'Infrared 400', brand: 'Rollei', iso: 400, ei: 400, category: 'bw', compensation: '0', p: 1.30, tip: 'Vrai film infrarouge. Utiliser avec filtre IR pour l\'effet Wood.' },
+            { id: 'rpx100', name: 'RPX 100', brand: 'Rollei', iso: 100, ei: 100, category: 'bw', compensation: '0', p: 1.26, 
+              tip: '📷 Exposer à l\'ISO boîte (EI 100). Alternative économique au Delta 100. Bons résultats en Rodinal.',
+              visual: '🎨 Grain fin, bonne latitude, rendu neutre et propre.',
+              gallery: 'https://www.flickr.com/groups/rolleirpx/pool/' },
+            { id: 'rpx400', name: 'RPX 400', brand: 'Rollei', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.31, 
+              tip: '📷 Surexposer de 1/3 stop (EI 320). Alternative économique au HP5. Push correct jusqu\'à 1600.',
+              visual: '🎨 Polyvalent avec grain contrôlé, contraste modéré.',
+              gallery: 'https://www.flickr.com/groups/rolleirpx/pool/' },
+            { id: 'infrared400', name: 'Infrared 400', brand: 'Rollei', iso: 400, ei: 400, category: 'bw', compensation: '0', p: 1.30, 
+              tip: '📷 Vrai infrarouge (jusqu\'à 820nm). EI variable selon filtre (25-400). Charger en obscurité totale!',
+              visual: '🎨 Effet Wood SPECTACULAIRE: ciels noirs d\'encre, feuillages blancs comme neige, peau translucide.',
+              gallery: 'https://www.flickr.com/groups/rollei_infrared/pool/' },
             
             // KENTMERE / HARMAN
-            { id: 'kentmere100', name: 'Kentmere 100', brand: 'Kentmere', iso: 100, ei: 80, category: 'bw', compensation: '+1/3', p: 1.30, tip: 'Par Harman (Ilford). Excellent rapport qualité/prix.' },
-            { id: 'kentmere400', name: 'Kentmere 400', brand: 'Kentmere', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.30, tip: 'Alternative économique au HP5.' },
+            { id: 'kentmere100', name: 'Kentmere 100', brand: 'Kentmere', iso: 100, ei: 80, category: 'bw', compensation: '+1/3', p: 1.30, 
+              tip: '📷 Surexposer de 1/3 stop (EI 80). Par Harman (Ilford). Alternative économique au FP4 Plus.',
+              visual: '🎨 Grain classique, bon piqué, rendu honnête. Le N&B économique de qualité.',
+              gallery: 'https://www.flickr.com/groups/kentmere/pool/' },
+            { id: 'kentmere400', name: 'Kentmere 400', brand: 'Kentmere', iso: 400, ei: 320, category: 'bw', compensation: '+1/3', p: 1.30, 
+              tip: '📷 Surexposer de 1/3 stop (EI 320). Même fabricant que HP5. Push correct jusqu\'à 1600.',
+              visual: '🎨 Alternative budget au HP5 Plus: grain légèrement plus prononcé, contraste similaire.',
+              gallery: 'https://www.flickr.com/groups/kentmere/pool/' },
             
             // LOMOGRAPHY
-            { id: 'lomo100', name: 'Color 100', brand: 'Lomography', iso: 100, ei: 80, category: 'color-neg', compensation: '+1/3', p: 1.33, tip: 'Couleurs saturées "lomo". Pour l\'expérimentation.' },
-            { id: 'lomo400', name: 'Color 400', brand: 'Lomography', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.33, tip: 'Polyvalent avec le rendu Lomo caractéristique.' },
-            { id: 'lomo800', name: 'Color 800', brand: 'Lomography', iso: 800, ei: 400, category: 'color-neg', compensation: '+1', p: 1.33, tip: 'Pour la basse lumière, grain créatif.' },
+            { id: 'lomo100', name: 'Color 100', brand: 'Lomography', iso: 100, ei: 80, category: 'color-neg', compensation: '+1/3', p: 1.33, 
+              tip: '📷 Surexposer de 1/3 stop (EI 80). Pour l\'expérimentation créative.',
+              visual: '🎨 Couleurs saturées et punchy, style "lomo" expressif. Portraits stylisés, expérimentation.',
+              gallery: 'https://www.lomography.com/films/4158069-lomography-color-negative-100/photos' },
+            { id: 'lomo400', name: 'Color 400', brand: 'Lomography', iso: 400, ei: 200, category: 'color-neg', compensation: '+1', p: 1.33, 
+              tip: '📷 Surexposer d\'1 stop (EI 200). Polyvalent, bon pour conditions variées.',
+              visual: '🎨 Rendu Lomo saturé caractéristique, grain visible mais charmant. Tout-terrain créatif.',
+              gallery: 'https://www.lomography.com/films/4162421-lomography-color-negative-400/photos' },
+            { id: 'lomo800', name: 'Color 800', brand: 'Lomography', iso: 800, ei: 400, category: 'color-neg', compensation: '+1', p: 1.33, 
+              tip: '📷 Surexposer d\'1 stop (EI 400). Alternative économique au Portra 800.',
+              visual: '🎨 Grain créatif expressif, couleurs vives même en basse lumière. Soirées, concerts, ambiances.',
+              gallery: 'https://www.lomography.com/films/4164741-lomography-color-negative-800/photos' },
         ];
         
         // ===========================================
@@ -786,6 +1501,10 @@
         let rolls = JSON.parse(localStorage.getItem('filmlog_rolls') || '[]');
         let selectedFilm = null;
         let selectedEV = null;
+        let compareMode = false;
+        let compareFilms = [];
+        let cameraStream = null;
+        let meterMode = 'camera'; // 'camera' or 'manual'
         
         // ===========================================
         // TAB NAVIGATION
@@ -800,14 +1519,147 @@
         });
         
         // ===========================================
+        // SEARCH & FILTER
+        // ===========================================
+        const searchInput = document.getElementById('film-search');
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = searchInput.value.toLowerCase().trim();
+                renderFilms(document.querySelector('.category-btn.active').dataset.category, query);
+            }, 200);
+        });
+        
+        // Category filters
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderFilms(btn.dataset.category, searchInput.value.toLowerCase().trim());
+            });
+        });
+        
+        // ===========================================
+        // COMPARE MODE
+        // ===========================================
+        document.getElementById('compare-toggle').addEventListener('click', () => {
+            compareMode = !compareMode;
+            document.getElementById('compare-toggle').classList.toggle('active', compareMode);
+            document.getElementById('film-grid').classList.toggle('compare-mode', compareMode);
+            
+            if (!compareMode) {
+                clearCompare();
+            }
+        });
+        
+        function toggleCompareFilm(filmId, event) {
+            event.stopPropagation();
+            
+            const index = compareFilms.indexOf(filmId);
+            if (index > -1) {
+                compareFilms.splice(index, 1);
+            } else if (compareFilms.length < 4) {
+                compareFilms.push(filmId);
+            } else {
+                showToast('Maximum 4 films à comparer');
+                return;
+            }
+            
+            updateCompareUI();
+        }
+        
+        function updateCompareUI() {
+            document.querySelectorAll('.film-card').forEach(card => {
+                const filmId = card.dataset.filmId;
+                const isSelected = compareFilms.includes(filmId);
+                card.classList.toggle('compare-selected', isSelected);
+                const checkbox = card.querySelector('.compare-checkbox');
+                if (checkbox) {
+                    checkbox.textContent = isSelected ? '✓' : '';
+                }
+            });
+            
+            document.getElementById('compare-count').textContent = compareFilms.length;
+            document.getElementById('compare-panel').classList.toggle('visible', compareFilms.length > 0);
+        }
+        
+        function clearCompare() {
+            compareFilms = [];
+            updateCompareUI();
+        }
+        
+        function showCompareModal() {
+            if (compareFilms.length < 2) {
+                showToast('Sélectionnez au moins 2 films');
+                return;
+            }
+            
+            const filmsToCompare = compareFilms.map(id => films.find(f => f.id === id));
+            const table = document.getElementById('compare-table');
+            
+            const attributes = [
+                { key: 'brand', label: 'Marque' },
+                { key: 'iso', label: 'ISO boîte' },
+                { key: 'ei', label: 'EI recommandé' },
+                { key: 'compensation', label: 'Compensation' },
+                { key: 'category', label: 'Type', format: getCategoryLabel },
+                { key: 'p', label: 'Réciprocité (p)', format: v => v === 1.0 ? 'Aucune' : v.toFixed(2) },
+                { key: 'visual', label: 'Look' },
+            ];
+            
+            let html = '<thead><tr><th></th>';
+            filmsToCompare.forEach(f => {
+                html += `<th>${f.name}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            attributes.forEach(attr => {
+                html += `<tr><td>${attr.label}</td>`;
+                filmsToCompare.forEach(f => {
+                    let value = f[attr.key];
+                    if (attr.format) value = attr.format(value);
+                    html += `<td>${value}</td>`;
+                });
+                html += '</tr>';
+            });
+            
+            html += '</tbody>';
+            table.innerHTML = html;
+            
+            document.getElementById('compare-modal').classList.add('visible');
+        }
+        
+        function closeCompareModal() {
+            document.getElementById('compare-modal').classList.remove('visible');
+        }
+        
+        // ===========================================
         // FILM DATABASE RENDERING
         // ===========================================
-        function renderFilms(category = 'all') {
+        function renderFilms(category = 'all', query = '') {
             const grid = document.getElementById('film-grid');
-            const filtered = category === 'all' ? films : films.filter(f => f.category === category);
+            let filtered = category === 'all' ? films : films.filter(f => f.category === category);
+            
+            if (query) {
+                filtered = filtered.filter(f => 
+                    f.name.toLowerCase().includes(query) ||
+                    f.brand.toLowerCase().includes(query) ||
+                    (f.visual && f.visual.toLowerCase().includes(query))
+                );
+            }
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="no-results">Aucun film trouvé</div>';
+                return;
+            }
             
             grid.innerHTML = filtered.map(film => `
-                <div class="film-card ${selectedFilm?.id === film.id ? 'selected' : ''}" onclick="selectFilm('${film.id}')">
+                <div class="film-card ${selectedFilm?.id === film.id ? 'selected' : ''} ${compareFilms.includes(film.id) ? 'compare-selected' : ''}" 
+                     data-film-id="${film.id}"
+                     onclick="${compareMode ? `toggleCompareFilm('${film.id}', event)` : `selectFilm('${film.id}')`}">
+                    <div class="compare-checkbox">${compareFilms.includes(film.id) ? '✓' : ''}</div>
                     <div class="film-card-header">
                         <div>
                             <div class="film-name">${film.name}</div>
@@ -832,38 +1684,151 @@
             return labels[cat] || cat;
         }
         
-        // Category filters
-        document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                renderFilms(btn.dataset.category);
-            });
-        });
-        
         // ===========================================
         // FILM SELECTION & METER
         // ===========================================
         function selectFilm(filmId) {
             selectedFilm = films.find(f => f.id === filmId);
-            renderFilms(document.querySelector('.category-btn.active').dataset.category);
+            renderFilms(document.querySelector('.category-btn.active').dataset.category, searchInput.value.toLowerCase().trim());
             
             document.getElementById('meter-section').classList.add('visible');
             document.getElementById('selected-film-name').textContent = `${selectedFilm.brand} ${selectedFilm.name}`;
             document.getElementById('selected-ei').textContent = selectedFilm.ei;
             document.getElementById('selected-comp').textContent = selectedFilm.compensation !== '0' ? selectedFilm.compensation : 'Aucune';
             
-            // Reset light selection
+            // Reset
             document.querySelectorAll('.light-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('results-card').style.display = 'none';
             document.getElementById('tip-card').style.display = 'none';
             selectedEV = null;
             
+            // Show tip immediately
+            showTip();
+            
             // Scroll to meter
             document.getElementById('meter-section').scrollIntoView({ behavior: 'smooth' });
         }
         
-        // Light condition selection
+        function showTip() {
+            if (!selectedFilm) return;
+            document.getElementById('tip-card').style.display = 'block';
+            document.getElementById('tip-text').textContent = selectedFilm.tip;
+            document.getElementById('tip-visual').textContent = selectedFilm.visual || '';
+            
+            const galleryContainer = document.getElementById('tip-gallery');
+            if (selectedFilm.gallery) {
+                galleryContainer.innerHTML = `<a href="${selectedFilm.gallery}" target="_blank" rel="noopener">📸 Voir des exemples →</a>`;
+            } else {
+                galleryContainer.innerHTML = '';
+            }
+        }
+        
+        // ===========================================
+        // METER MODE TOGGLE
+        // ===========================================
+        document.querySelectorAll('.meter-mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.meter-mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                meterMode = btn.dataset.mode;
+                
+                document.getElementById('camera-meter').style.display = meterMode === 'camera' ? 'block' : 'none';
+                document.getElementById('manual-meter').style.display = meterMode === 'manual' ? 'block' : 'none';
+                
+                if (meterMode === 'manual' && cameraStream) {
+                    stopCamera();
+                }
+            });
+        });
+        
+        // ===========================================
+        // CAMERA LIGHT METER
+        // ===========================================
+        async function startCamera() {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
+                });
+                
+                const video = document.getElementById('camera-video');
+                video.srcObject = cameraStream;
+                video.style.display = 'block';
+                document.getElementById('camera-placeholder').style.display = 'none';
+                document.getElementById('camera-overlay').style.display = 'flex';
+                
+                // Start metering loop
+                startMeteringLoop(video);
+            } catch (err) {
+                console.error('Camera error:', err);
+                showToast('Impossible d\'accéder à la caméra');
+            }
+        }
+        
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            document.getElementById('camera-video').style.display = 'none';
+            document.getElementById('camera-placeholder').style.display = 'flex';
+            document.getElementById('camera-overlay').style.display = 'none';
+        }
+        
+        function startMeteringLoop(video) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            function meter() {
+                if (!cameraStream) return;
+                
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0);
+                
+                // Sample center region (spot meter simulation)
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const sampleSize = 50;
+                
+                const imageData = ctx.getImageData(
+                    centerX - sampleSize/2, 
+                    centerY - sampleSize/2, 
+                    sampleSize, 
+                    sampleSize
+                );
+                
+                // Calculate luminance
+                let totalLuminance = 0;
+                for (let i = 0; i < imageData.data.length; i += 4) {
+                    const r = imageData.data[i];
+                    const g = imageData.data[i + 1];
+                    const b = imageData.data[i + 2];
+                    // Luminance formula (ITU-R BT.709)
+                    totalLuminance += 0.2126 * r + 0.7152 * g + 0.0722 * b;
+                }
+                
+                const avgLuminance = totalLuminance / (sampleSize * sampleSize);
+                
+                // Convert to EV (simplified formula)
+                // EV = log2(L * K / C) where K is calibration, C is constant
+                // This is an approximation - real light meters are calibrated
+                const ev = Math.round(Math.log2(avgLuminance / 2.5 + 0.1) + 3);
+                const clampedEV = Math.max(-2, Math.min(18, ev));
+                
+                document.getElementById('camera-ev').textContent = clampedEV;
+                
+                if (selectedFilm && clampedEV !== selectedEV) {
+                    selectedEV = clampedEV;
+                    calculateExposure();
+                }
+                
+                requestAnimationFrame(meter);
+            }
+            
+            meter();
+        }
+        
+        // Manual light condition selection
         document.querySelectorAll('.light-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.light-btn').forEach(b => b.classList.remove('active'));
@@ -874,52 +1839,35 @@
         });
         
         // ===========================================
-        // EXPOSURE CALCULATION (ANSI Standard Formula)
-        // Vérifié avec 3 méthodes: Sunny 16, formule EV, posemètre
+        // EXPOSURE CALCULATION (ANSI Standard)
         // ===========================================
         function calculateExposure() {
             if (!selectedFilm || selectedEV === null) return;
             
-            // Formule standard ANSI:
-            // t = N² × 100 / (2^EV100 × ISO)
-            // où N = ouverture, EV100 = valeur EV à ISO 100, ISO = sensibilité du film
-            
             document.getElementById('ev-display').textContent = selectedEV;
             document.getElementById('results-card').style.display = 'block';
             
-            // Afficher tip
-            document.getElementById('tip-card').style.display = 'block';
-            document.getElementById('tip-text').textContent = selectedFilm.tip;
-            
-            // Note réciprocité si applicable
             const recipNote = document.getElementById('reciprocity-note');
-            
-            // Calculer les couples ouverture/vitesse
             const apertures = [1.4, 2, 2.8, 4, 5.6, 8, 11, 16];
             const grid = document.getElementById('exposure-grid');
             
             const iso = selectedFilm.ei;
             const ev100 = selectedEV;
-            
-            // Pré-calculer 2^EV100 pour optimisation
             const twoToEV = Math.pow(2, ev100);
             
             grid.innerHTML = apertures.map(ap => {
-                // Formule ANSI: t = N² × 100 / (2^EV100 × ISO)
-                let shutterSeconds = (ap * ap * 100) / (twoToEV * iso);
+                const N2 = ap * ap;
+                const t = N2 * 100 / (twoToEV * iso);
                 
-                // Appliquer la réciprocité si nécessaire (poses > 1s)
-                let correctedShutter = shutterSeconds;
+                let correctedShutter = t;
                 let isLongExposure = false;
                 
-                if (shutterSeconds > 1 && selectedFilm.p > 1.0) {
-                    correctedShutter = Math.pow(shutterSeconds, selectedFilm.p);
+                if (t > 1 && selectedFilm.p !== 1.0) {
+                    correctedShutter = Math.pow(t, selectedFilm.p);
                     isLongExposure = true;
-                }
-                
-                // Afficher note réciprocité si poses longues probables
-                if (ev100 <= 6 && selectedFilm.p > 1.0) {
-                    recipNote.textContent = `Réciprocité: p=${selectedFilm.p}`;
+                    if (recipNote.textContent === '') {
+                        recipNote.textContent = `⚠️ Réciprocité: temps corrigés (p=${selectedFilm.p})`;
+                    }
                 } else {
                     recipNote.textContent = '';
                 }
@@ -942,7 +1890,6 @@
             } else if (seconds >= 1) {
                 return `${seconds.toFixed(1)}s`;
             } else {
-                // Trouver la vitesse standard la plus proche
                 const speeds = [8000, 4000, 2000, 1000, 500, 250, 125, 60, 30, 15, 8, 4, 2];
                 const fraction = 1 / seconds;
                 const closest = speeds.reduce((prev, curr) => 
@@ -961,51 +1908,111 @@
             if (rolls.length === 0) {
                 list.innerHTML = `
                     <div class="empty-state">
-                        <div class="icon">📷</div>
-                        <p>Aucune pellicule enregistrée<br>Ajoute ta première bobine !</p>
+                        <div class="icon">🎞️</div>
+                        <p>Aucun rouleau enregistré</p>
                     </div>
                 `;
                 return;
             }
             
             list.innerHTML = rolls.map((roll, index) => {
-                const film = films.find(f => f.id === roll.filmId) || { name: roll.filmId, brand: '' };
+                const film = films.find(f => f.id === roll.filmId);
+                const frameCount = roll.frames ? roll.frames.length : 0;
+                const maxFrames = getMaxFrames(roll.format);
+                
                 return `
                     <div class="roll-card">
-                        <div class="roll-header">
-                            <div>
-                                <div class="roll-film-name">${film.brand} ${film.name}</div>
-                                <div class="roll-camera">${roll.camera || 'Appareil non spécifié'}</div>
+                        <div class="roll-header" onclick="toggleRollExpand(${index})">
+                            <div class="roll-info">
+                                <h3>${film ? film.name : roll.filmId}</h3>
+                                <div class="roll-meta">
+                                    <span>${roll.camera || 'Non spécifié'}</span>
+                                    <span>${roll.format}</span>
+                                    <span>${frameCount}/${maxFrames} poses</span>
+                                </div>
                             </div>
                             <span class="roll-status ${roll.status}">${getStatusLabel(roll.status)}</span>
                         </div>
-                        <div class="roll-meta">
-                            <span>📅 ${formatDate(roll.date)}</span>
-                            ${roll.frames ? `<span>🎞️ ${roll.frames} poses</span>` : ''}
+                        <div class="roll-frames ${roll.expanded ? 'expanded' : ''}" id="roll-frames-${index}">
+                            <div class="frames-header">
+                                <span class="frames-count">${frameCount} poses enregistrées</span>
+                                <button class="add-frame-btn" onclick="showAddFrameModal(${index})">+ Pose</button>
+                            </div>
+                            <div class="frames-list">
+                                ${(roll.frames || []).map((frame, fIndex) => `
+                                    <div class="frame-item">
+                                        <div class="frame-number">${fIndex + 1}</div>
+                                        <div class="frame-details">
+                                            <div class="frame-exposure">f/${frame.aperture} @ ${frame.shutter}</div>
+                                            ${frame.notes ? `<div class="frame-notes">${frame.notes}</div>` : ''}
+                                        </div>
+                                        <button class="frame-delete" onclick="deleteFrame(${index}, ${fIndex})">🗑️</button>
+                                    </div>
+                                `).join('')}
+                            </div>
                         </div>
-                        ${roll.notes ? `<div class="roll-meta" style="margin-top: 8px;"><span>📝 ${roll.notes}</span></div>` : ''}
                         <div class="roll-actions">
-                            <button class="roll-action-btn" onclick="cycleStatus(${index})">Changer statut</button>
-                            <button class="roll-action-btn" onclick="deleteRoll(${index})">Supprimer</button>
+                            <button onclick="cycleRollStatus(${index})">📊 Statut</button>
+                            <button onclick="editRoll(${index})">✏️ Modifier</button>
+                            <button class="btn-danger" onclick="deleteRoll(${index})">🗑️</button>
                         </div>
                     </div>
                 `;
             }).join('');
         }
         
+        function getMaxFrames(format) {
+            const frames = { '35mm': 36, '35mm-24': 24, '120': 12, '4x5': 1 };
+            return frames[format] || 36;
+        }
+        
         function getStatusLabel(status) {
-            const labels = { loaded: 'Chargée', finished: 'Terminée', developed: 'Développée' };
+            const labels = { shooting: 'En cours', finished: 'Terminé', developed: 'Développé' };
             return labels[status] || status;
         }
         
-        function formatDate(dateStr) {
-            if (!dateStr) return '-';
-            const d = new Date(dateStr);
-            return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+        function toggleRollExpand(index) {
+            rolls[index].expanded = !rolls[index].expanded;
+            saveRolls();
+            renderRolls();
         }
         
-        function cycleStatus(index) {
-            const statuses = ['loaded', 'finished', 'developed'];
+        function showAddRollModal() {
+            document.getElementById('roll-modal-title').textContent = 'Nouveau rouleau';
+            document.getElementById('roll-film').innerHTML = films.map(f => 
+                `<option value="${f.id}">${f.brand} ${f.name}</option>`
+            ).join('');
+            document.getElementById('roll-format').value = '35mm';
+            document.getElementById('roll-camera').value = '';
+            document.getElementById('roll-notes').value = '';
+            document.getElementById('roll-modal').classList.add('visible');
+        }
+        
+        function closeRollModal() {
+            document.getElementById('roll-modal').classList.remove('visible');
+        }
+        
+        function saveRoll() {
+            const roll = {
+                id: Date.now(),
+                filmId: document.getElementById('roll-film').value,
+                format: document.getElementById('roll-format').value,
+                camera: document.getElementById('roll-camera').value,
+                notes: document.getElementById('roll-notes').value,
+                status: 'shooting',
+                frames: [],
+                created: new Date().toISOString()
+            };
+            
+            rolls.unshift(roll);
+            saveRolls();
+            renderRolls();
+            closeRollModal();
+            showToast('Rouleau ajouté');
+        }
+        
+        function cycleRollStatus(index) {
+            const statuses = ['shooting', 'finished', 'developed'];
             const current = statuses.indexOf(rolls[index].status);
             rolls[index].status = statuses[(current + 1) % statuses.length];
             saveRolls();
@@ -1013,11 +2020,65 @@
         }
         
         function deleteRoll(index) {
-            if (confirm('Supprimer cette pellicule ?')) {
+            if (confirm('Supprimer ce rouleau ?')) {
                 rolls.splice(index, 1);
                 saveRolls();
                 renderRolls();
+                showToast('Rouleau supprimé');
             }
+        }
+        
+        function editRoll(index) {
+            // For simplicity, just show toast - could implement full edit modal
+            showToast('Modification: utilisez Supprimer + Ajouter');
+        }
+        
+        // ===========================================
+        // FRAME MANAGEMENT
+        // ===========================================
+        function showAddFrameModal(rollIndex) {
+            document.getElementById('frame-roll-id').value = rollIndex;
+            document.getElementById('frame-aperture').value = '5.6';
+            document.getElementById('frame-shutter').value = '1/125';
+            document.getElementById('frame-notes').value = '';
+            document.getElementById('frame-modal').classList.add('visible');
+        }
+        
+        function closeFrameModal() {
+            document.getElementById('frame-modal').classList.remove('visible');
+        }
+        
+        function saveFrame() {
+            const rollIndex = parseInt(document.getElementById('frame-roll-id').value);
+            const frame = {
+                aperture: document.getElementById('frame-aperture').value,
+                shutter: document.getElementById('frame-shutter').value,
+                notes: document.getElementById('frame-notes').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            if (!rolls[rollIndex].frames) {
+                rolls[rollIndex].frames = [];
+            }
+            
+            const maxFrames = getMaxFrames(rolls[rollIndex].format);
+            if (rolls[rollIndex].frames.length >= maxFrames) {
+                showToast(`Maximum ${maxFrames} poses atteint`);
+                return;
+            }
+            
+            rolls[rollIndex].frames.push(frame);
+            rolls[rollIndex].expanded = true;
+            saveRolls();
+            renderRolls();
+            closeFrameModal();
+            showToast('Pose ajoutée');
+        }
+        
+        function deleteFrame(rollIndex, frameIndex) {
+            rolls[rollIndex].frames.splice(frameIndex, 1);
+            saveRolls();
+            renderRolls();
         }
         
         function saveRolls() {
@@ -1025,52 +2086,128 @@
         }
         
         // ===========================================
-        // MODAL
+        // EXPORT FUNCTIONS
         // ===========================================
-        function openModal() {
-            const select = document.getElementById('roll-film');
-            select.innerHTML = films.map(f => 
-                `<option value="${f.id}">${f.brand} ${f.name} (ISO ${f.iso})</option>`
-            ).join('');
-            
-            document.getElementById('roll-date').valueAsDate = new Date();
-            document.getElementById('roll-camera').value = '';
-            document.getElementById('roll-notes').value = '';
-            document.getElementById('modal-overlay').classList.add('active');
-        }
-        
-        function closeModal() {
-            document.getElementById('modal-overlay').classList.remove('active');
-        }
-        
-        function saveRoll() {
-            const roll = {
-                filmId: document.getElementById('roll-film').value,
-                camera: document.getElementById('roll-camera').value,
-                date: document.getElementById('roll-date').value,
-                notes: document.getElementById('roll-notes').value,
-                status: 'loaded',
-                frames: 0
-            };
-            
-            rolls.unshift(roll);
-            saveRolls();
-            renderRolls();
-            closeModal();
-        }
-        
-        // Close modal on overlay click
-        document.getElementById('modal-overlay').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('modal-overlay')) {
-                closeModal();
+        function exportJSON() {
+            if (rolls.length === 0) {
+                showToast('Aucun rouleau à exporter');
+                return;
             }
-        });
+            
+            const exportData = rolls.map(roll => {
+                const film = films.find(f => f.id === roll.filmId);
+                return {
+                    ...roll,
+                    filmName: film ? `${film.brand} ${film.name}` : roll.filmId,
+                    filmISO: film ? film.iso : null,
+                    filmEI: film ? film.ei : null
+                };
+            });
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `filmlog_export_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Export JSON téléchargé');
+        }
+        
+        function exportPDF() {
+            if (rolls.length === 0) {
+                showToast('Aucun rouleau à exporter');
+                return;
+            }
+            
+            // Generate HTML for PDF
+            let html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>FilmLog Export</title>
+                    <style>
+                        body { font-family: -apple-system, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+                        h1 { color: #ff6b35; }
+                        .roll { border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+                        .roll h2 { margin: 0 0 8px 0; }
+                        .roll-meta { color: #666; font-size: 14px; margin-bottom: 12px; }
+                        .frame { background: #f5f5f5; padding: 8px 12px; border-radius: 4px; margin: 4px 0; display: flex; gap: 16px; }
+                        .frame-num { font-weight: bold; width: 30px; }
+                        .status { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+                        .shooting { background: #4ade80; }
+                        .finished { background: #fbbf24; }
+                        .developed { background: #3b82f6; color: white; }
+                    </style>
+                </head>
+                <body>
+                    <h1>🎞️ FilmLog Export</h1>
+                    <p>Exporté le ${new Date().toLocaleDateString('fr-FR')}</p>
+            `;
+            
+            rolls.forEach(roll => {
+                const film = films.find(f => f.id === roll.filmId);
+                html += `
+                    <div class="roll">
+                        <h2>${film ? `${film.brand} ${film.name}` : roll.filmId}</h2>
+                        <div class="roll-meta">
+                            <span class="status ${roll.status}">${getStatusLabel(roll.status)}</span>
+                            ${roll.camera ? `• ${roll.camera}` : ''} • ${roll.format}
+                            ${roll.notes ? `<br><em>${roll.notes}</em>` : ''}
+                        </div>
+                `;
+                
+                if (roll.frames && roll.frames.length > 0) {
+                    roll.frames.forEach((frame, i) => {
+                        html += `
+                            <div class="frame">
+                                <span class="frame-num">#${i + 1}</span>
+                                <span>f/${frame.aperture} @ ${frame.shutter}</span>
+                                ${frame.notes ? `<span style="color:#666">${frame.notes}</span>` : ''}
+                            </div>
+                        `;
+                    });
+                }
+                
+                html += '</div>';
+            });
+            
+            html += '</body></html>';
+            
+            // Open in new window for printing
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.print();
+            
+            showToast('PDF prêt à imprimer');
+        }
+        
+        // ===========================================
+        // UTILITY FUNCTIONS
+        // ===========================================
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 2500);
+        }
         
         // ===========================================
         // INIT
         // ===========================================
         renderFilms();
         renderRolls();
+        
+        // Close modals on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('visible');
+                }
+            });
+        });
     </script>
 </body>
 </html>
